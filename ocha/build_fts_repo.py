@@ -44,3 +44,25 @@ def fetch_appeals_json_for_country(country):
     This accepts both names ("Slovakia") and ISO country codes ("SVK")
     """
     return fetch_json(build_json_url("Appeal/country/" + country))
+
+
+def fetch_projects_json_for_appeal(appeal_id):
+    return fetch_json(build_json_url("Project/appeal/" + str(appeal_id)))
+
+
+def fetch_clusters_json_for_appeal(appeal_id):
+    return fetch_json(build_json_url("Cluster/appeal/" + str(appeal_id)))
+
+
+def fetch_contribution_json_for_appeal(appeal_id):
+    return fetch_json(build_json_url("Contribution/appeal/" + str(appeal_id)))
+
+
+def fetch_funding_json_for_appeal(appeal_id):
+    return fetch_json(build_json_url("funding") + "?Appeal=" + str(appeal_id))
+
+
+def fetch_pledges_json_for_appeal(appeal_id):
+    return fetch_json(build_json_url("pledges") + "?Appeal=" + str(appeal_id))
+
+
