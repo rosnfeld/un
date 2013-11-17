@@ -57,7 +57,7 @@ def fetch_clusters_json_for_appeal_as_dataframe(appeal_id):
     return fetch_json_as_dataframe(build_json_url('Cluster/appeal/' + str(appeal_id)))
 
 
-def fetch_contribution_json_for_appeal_as_dataframe(appeal_id):
+def fetch_contributions_json_for_appeal_as_dataframe(appeal_id):
     return fetch_json_as_dataframe_with_id(build_json_url('Contribution/appeal/' + str(appeal_id)))
 
 
