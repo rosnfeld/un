@@ -7,3 +7,5 @@ Abstract data source for pandas objects
 - JSON from file
 - pickle
 - etc
+
+Add a pip requirements file
