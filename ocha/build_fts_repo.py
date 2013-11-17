@@ -71,3 +71,14 @@ def fetch_pledges_json_for_appeal_as_dataframe(appeal_id):
     # NOTE no id present in this data, and it parses a bit weird
     # TODO improve parsing
     return fetch_json_as_dataframe(build_json_url('pledges') + '?Appeal=' + str(appeal_id))
+
+
+if __name__ == "__main__":
+    # test various fetch commands (requires internet connection)
+    country = 'Chad'
+    appeal_id = 942
+
+    print fetch_sectors_json_as_dataframe()
+    print fetch_emergencies_json_for_country_as_dataframe(country)
+    print fetch_projects_json_for_appeal_as_dataframe(appeal_id)
+    print fetch_funding_json_for_appeal_as_dataframe(appeal_id)
