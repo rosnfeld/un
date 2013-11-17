@@ -1,5 +1,7 @@
 Create a demo FTS report C or D from this data
 
+Start to look at what a first draft generic CSV format would be for CKAN
+
 Abstract data source for pandas objects
 - JSON from web
 - JSON from file
