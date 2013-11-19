@@ -1,7 +1,5 @@
 Create a demo FTS report C or D from this data
 
-Probably rename your main file to fts_queries.py or something similar
-
 Start to look at what a first draft generic CSV format would be for CKAN
 
 Abstract data source for pandas objects
@@ -11,3 +9,8 @@ Abstract data source for pandas objects
 - etc
 
 Add a pip requirements file
+
+
+DONE
+
+Rename your main file to fts_queries.py or something similar
