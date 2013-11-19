@@ -61,16 +61,34 @@ def fetch_contributions_json_for_appeal_as_dataframe(appeal_id):
     return fetch_json_as_dataframe_with_id(build_json_url('Contribution/appeal/' + str(appeal_id)))
 
 
-def fetch_funding_json_for_appeal_as_dataframe(appeal_id):
-    # NOTE no id present in this data, and it parses a bit weird
-    # TODO improve parsing
-    return fetch_json_as_dataframe(build_json_url('funding') + '?Appeal=' + str(appeal_id))
+def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, grouping=None):
+    """
+    Grouping can be one of:
+        Donor
+        Recipient
+        Sector
+        Emergency
+        Appeal
+        Country
+        Cluster
+    """
+    url = build_json_url(middle_part) + '?Appeal=' + str(appeal_id)
+
+    if grouping:
+        url += '&GroupBy=' + grouping
+
+    # NOTE no id present in this data
+    dataframe = fetch_json_as_dataframe(url)
+
+    return pd.DataFrame.from_records(dataframe.grouping.values)
 
 
-def fetch_pledges_json_for_appeal_as_dataframe(appeal_id):
-    # NOTE no id present in this data, and it parses a bit weird
-    # TODO improve parsing
-    return fetch_json_as_dataframe(build_json_url('pledges') + '?Appeal=' + str(appeal_id))
+def fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping=None):
+    return fetch_grouping_type_json_for_appeal_as_dataframe("funding", appeal_id, grouping)
+
+
+def fetch_pledges_json_for_appeal_as_dataframe(appeal_id, grouping=None):
+    return fetch_grouping_type_json_for_appeal_as_dataframe("pledges", appeal_id, grouping)
 
 
 if __name__ == "__main__":
