@@ -10,6 +10,9 @@ Abstract data source for pandas objects
 
 Add a pip requirements file
 
+Do some data validation
+ - make sure there are country entries for all appeals (you already found one case where this was missing!)
+
 
 DONE
 
