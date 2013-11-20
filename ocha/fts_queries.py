@@ -78,9 +78,10 @@ def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, gro
         url += '&GroupBy=' + grouping
 
     # NOTE no id present in this data
-    dataframe = fetch_json_as_dataframe(url)
+    raw_dataframe = fetch_json_as_dataframe(url)
 
-    return pd.DataFrame.from_records(dataframe.grouping.values)
+    # oddly the JSON of interest is nested inside the "grouping" element
+    return pd.DataFrame.from_records(raw_dataframe.grouping.values)
 
 
 def fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping=None):
