@@ -5,8 +5,6 @@ Create a demo FTS report D from this data
 
 Start to look at what a first draft generic CSV format would be for CKAN
 
-Add a pip requirements file
-
 Do some data validation
  - make sure there are country entries for all appeals (you already found one case where this was missing!)
 
@@ -20,3 +18,5 @@ Abstract data source for pandas objects
 DONE
 
 Rename your main file to fts_queries.py or something similar
+
+Add a pip requirements file
