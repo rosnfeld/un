@@ -85,10 +85,16 @@ def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, gro
 
 
 def fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping=None):
+    """
+    Committed or contributed funds, including carry over from previous years
+    """
     return fetch_grouping_type_json_for_appeal_as_dataframe("funding", appeal_id, grouping)
 
 
 def fetch_pledges_json_for_appeal_as_dataframe(appeal_id, grouping=None):
+    """
+    Contains uncommitted pledges, not funding that has already processed to commitment or contribution stages
+    """
     return fetch_grouping_type_json_for_appeal_as_dataframe("pledges", appeal_id, grouping)
 
 
