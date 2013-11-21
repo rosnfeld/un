@@ -27,8 +27,9 @@ requirements = projects_by_org['original_requirements', 'current_requirements'].
 # make organisation_abbreviation a column and no longer part of the index
 requirements = requirements.reset_index(level=1)
 
-# query funding, which interestingly seems to include "carry over"
-# TODO figure out how to break out "carry over"
+# query funding, which interestingly seems to include "carry over" from previous years
+# TODO figure out how to break out "carry over" - may actually need to look at contributions
+# however, note that the CHD does not require carry over
 funding_by_recipient = fts_queries.fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping='Recipient')
 # set up the index for the join
 funding_by_recipient = funding_by_recipient.rename(columns={'type': 'organisation', 'amount': 'funding_amount'})
