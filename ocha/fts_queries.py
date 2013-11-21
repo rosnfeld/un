@@ -1,7 +1,9 @@
 """
 This is just a quick stab to learn the FTS data and figure out how to arrange it.
-The idea will be to build a local repository of all the JSON as pandas data. (could be quite large)
-Then in a future step I'll join that all together into reasonable "views" on the data for CKAN.
+It provides queries against the FTS API, fetching JSON and translating it into pandas dataframes.
+It unfortunately doesn't show the structure of the returned data explicitly, that's all handled by pandas.
+At some point we may want to create dedicated classes for each type of data returned by the API, to do validation etc,
+but then we'll also need to implement join logic between these classes.
 """
 
 import pandas as pd
