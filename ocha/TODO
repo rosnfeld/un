@@ -1,17 +1,18 @@
-Create a demo FTS report C or D from this data
+Create a demo FTS report C from this data
+Create a demo FTS report D from this data
 
 Start to look at what a first draft generic CSV format would be for CKAN
+
+Add a pip requirements file
+
+Do some data validation
+ - make sure there are country entries for all appeals (you already found one case where this was missing!)
 
 Abstract data source for pandas objects
 - JSON from web
 - JSON from file
 - pickle
 - etc
-
-Add a pip requirements file
-
-Do some data validation
- - make sure there are country entries for all appeals (you already found one case where this was missing!)
 
 
 DONE
