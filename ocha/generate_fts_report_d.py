@@ -12,6 +12,7 @@ Uncommitted pledges USD
 """
 
 import fts_queries
+import pandas as pd
 import argparse
 import sys
 
@@ -22,11 +23,13 @@ appeal_id = args.appeal_id
 
 cluster_data = fts_queries.fetch_clusters_json_for_appeal_as_dataframe(appeal_id)
 
+# re-arrange columns
+cluster_data = pd.DataFrame(cluster_data,
+                            columns=['name', 'original_requirement', 'current_requirement', 'funding', 'pledges'])
+
 cluster_data['unmet_requirement'] = cluster_data.current_requirement - cluster_data.funding
 # note this is a fraction, not a percent, and not clipped to 100%
 cluster_data['fraction_covered'] = cluster_data.funding/cluster_data.current_requirement
-
-#TODO reorder the columns
 
 #For quick debugging just do: print cluster_data
 cluster_data.to_csv(sys.stdout, index=False, encoding='utf-8')

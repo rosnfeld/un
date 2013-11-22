@@ -1,7 +1,5 @@
-Create a demo FTS report D from this data
-  - should be pretty small modification to report C code
-
 Start to look at what a first draft generic CSV format would be for CKAN
+- based more on CHD or existing FTS reports?
 
 Ask CJ if splitting out carry-over is of interest
 
@@ -25,3 +23,5 @@ Figure out if contributions handle "carry over"
   - yes, you can look at the "donor" named "Carry-over (donors not specified)"
 
 Create a demo FTS report C from this data
+
+Create a demo FTS report D from this data
