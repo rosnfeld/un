@@ -60,7 +60,9 @@ def fetch_clusters_json_for_appeal_as_dataframe(appeal_id):
 
 
 def fetch_contributions_json_for_appeal_as_dataframe(appeal_id):
-    return fetch_json_as_dataframe_with_id(build_json_url('Contribution/appeal/' + str(appeal_id)))
+    dataframe = fetch_json_as_dataframe_with_id(build_json_url('Contribution/appeal/' + str(appeal_id)))
+    dataframe.decision_date = dataframe.decision_date.apply(pd.datetools.parse)
+    return dataframe
 
 
 def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, grouping=None):
