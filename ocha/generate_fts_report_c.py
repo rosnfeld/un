@@ -3,8 +3,8 @@ Take in an appeal ID and generate a type "C" FTS report:
 Appealing Org
 Original Requirements USD
 Revised Requirements USD
-Carry Over USD
-Funding USD
+Carry Over USD - this is currently not broken out, though could be
+Funding USD - this is the funding (contributions + commitments) separate from carry over, also not currently broken out
 Total Resources Available USD
 Unmet Requirements USD
 % Covered
@@ -28,8 +28,7 @@ requirements = projects_by_org['original_requirements', 'current_requirements'].
 requirements = requirements.reset_index(level=1)
 
 # query funding, which interestingly seems to include "carry over" from previous years
-# TODO figure out how to break out "carry over" - may actually need to look at contributions
-# however, note that the CHD does not require carry over
+# note that the CHD does not require carry over to be broken out
 funding_by_recipient = fts_queries.fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping='Recipient')
 # set up the index for the join
 funding_by_recipient = funding_by_recipient.rename(columns={'type': 'organisation', 'amount': 'funding_amount'})
