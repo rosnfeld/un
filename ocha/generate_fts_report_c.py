@@ -14,6 +14,7 @@ Uncommitted pledges USD
 import fts_queries
 import pandas as pd
 import argparse
+import sys
 
 parser = argparse.ArgumentParser(description='Produce a FTS type "C" report for a given appeal')
 parser.add_argument('appeal_id', type=int)
@@ -51,8 +52,8 @@ merged = pd.merge(merged, pledges_by_recipient, left_index=True, right_index=Tru
 merged = merged.fillna(0)
 
 merged['unmet_requirements'] = merged.current_requirements - merged.funding_amount
+# note this is a fraction, not a percent, and not clipped to 100%
 merged['fraction_covered'] = merged.funding_amount/merged.current_requirements
 
-#TODO output CSV
-
-print merged.head()
+#For quick debugging just do: print merged.head()
+merged.to_csv(sys.stdout, index=False, encoding='utf-8')
