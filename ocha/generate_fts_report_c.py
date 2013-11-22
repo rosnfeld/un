@@ -13,9 +13,12 @@ Uncommitted pledges USD
 
 import fts_queries
 import pandas as pd
+import argparse
 
-# TODO take a command line argument
-appeal_id = 989
+parser = argparse.ArgumentParser(description='Produce a FTS type "C" report for a given appeal')
+parser.add_argument('appeal_id', type=int)
+args = parser.parse_args()
+appeal_id = args.appeal_id
 
 # load the projects dataset, and then group projects by organization
 projects = fts_queries.fetch_projects_json_for_appeal_as_dataframe(appeal_id)
