@@ -24,6 +24,11 @@ def build_json_url(middle_part):
     return FTS_BASE_URL + middle_part + JSON_SUFFIX
 
 
+def convert_date_columns_from_string_to_timestamp(dataframe, column_names):
+    for column_name in column_names:
+        dataframe[column_name] = dataframe[column_name].apply(pd.datetools.parse)
+
+
 def fetch_sectors_json_as_dataframe():
     return fetch_json_as_dataframe_with_id(build_json_url('Sector'))
 
@@ -47,11 +52,15 @@ def fetch_appeals_json_for_country_as_dataframe(country):
     """
     This accepts both names ("Slovakia") and ISO country codes ("SVK")
     """
-    return fetch_json_as_dataframe_with_id(build_json_url('Appeal/country/' + country))
+    dataframe = fetch_json_as_dataframe_with_id(build_json_url('Appeal/country/' + country))
+    convert_date_columns_from_string_to_timestamp(dataframe, ['start_date', 'end_date', 'launch_date'])
+    return dataframe
 
 
 def fetch_projects_json_for_appeal_as_dataframe(appeal_id):
-    return fetch_json_as_dataframe_with_id(build_json_url('Project/appeal/' + str(appeal_id)))
+    dataframe = fetch_json_as_dataframe_with_id(build_json_url('Project/appeal/' + str(appeal_id)))
+    convert_date_columns_from_string_to_timestamp(dataframe, ['end_date', 'last_updated_datetime'])
+    return dataframe
 
 
 def fetch_clusters_json_for_appeal_as_dataframe(appeal_id):
@@ -61,7 +70,7 @@ def fetch_clusters_json_for_appeal_as_dataframe(appeal_id):
 
 def fetch_contributions_json_for_appeal_as_dataframe(appeal_id):
     dataframe = fetch_json_as_dataframe_with_id(build_json_url('Contribution/appeal/' + str(appeal_id)))
-    dataframe.decision_date = dataframe.decision_date.apply(pd.datetools.parse)
+    convert_date_columns_from_string_to_timestamp(dataframe, ['decision_date'])
     return dataframe
 
 
