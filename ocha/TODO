@@ -6,6 +6,10 @@ Ask CJ if splitting out carry-over is of interest
 Do some data validation
  - make sure there are country entries for all appeals (you already found one case where this was missing!)
 
+Make some sort of entity relationship diagram to help document FTS data? Roughly:
+- countries have emergencies, which have appeals, which have projects (categorized into clusters)
+- donations can be made to projects, which are carried out by organizations
+
 Abstract data source for pandas objects
 - JSON from web
 - JSON from file
