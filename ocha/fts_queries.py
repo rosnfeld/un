@@ -48,13 +48,21 @@ def fetch_emergencies_json_for_country_as_dataframe(country):
     return fetch_json_as_dataframe_with_id(build_json_url('Emergency/country/' + country))
 
 
+def fetch_appeals_json_as_dataframe_given_url(url):
+    dataframe = fetch_json_as_dataframe_with_id(url)
+    convert_date_columns_from_string_to_timestamp(dataframe, ['start_date', 'end_date', 'launch_date'])
+    return dataframe
+
+
 def fetch_appeals_json_for_country_as_dataframe(country):
     """
     This accepts both names ("Slovakia") and ISO country codes ("SVK")
     """
-    dataframe = fetch_json_as_dataframe_with_id(build_json_url('Appeal/country/' + country))
-    convert_date_columns_from_string_to_timestamp(dataframe, ['start_date', 'end_date', 'launch_date'])
-    return dataframe
+    return fetch_appeals_json_as_dataframe_given_url(build_json_url('Appeal/country/' + country))
+
+
+def fetch_appeals_json_for_year_as_dataframe(year):
+    return fetch_appeals_json_as_dataframe_given_url(build_json_url('Appeal/year/' + str(year)))
 
 
 def fetch_projects_json_for_appeal_as_dataframe(appeal_id):
