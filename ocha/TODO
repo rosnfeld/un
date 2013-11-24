@@ -2,12 +2,11 @@ Start to look at what a first draft generic CSV format would be for CKAN
 - based more on CHD or existing FTS reports?
 
 Figure out CERF/CHF/ERF funding
-- perhaps appeal 1009 is a clue
+- perhaps appeal 1009 / emergency 15451, highlighted by your data validation, are relevant?
+  - yes, these seem to house CERF data
+    - you need to look at raw contributions, not funding, to find answers though..?
 
 Ask CJ if splitting out carry-over is of interest
-
-Do some data validation
- - make sure there are country entries for all appeals (you already found one case where this was missing!)
 
 Make some sort of entity relationship diagram to help document FTS data? It seems something roughly like:
 - countries have emergencies, which have appeals, which have projects (categorized into clusters)
@@ -32,3 +31,6 @@ Figure out if contributions handle "carry over"
 Create a demo FTS report C from this data
 
 Create a demo FTS report D from this data
+
+Do some data validation
+ - make sure there are country entries for all appeals (you already found one case where this was missing!)
