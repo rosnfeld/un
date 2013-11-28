@@ -86,7 +86,7 @@ def fetch_contributions_json_for_appeal_as_dataframe(appeal_id):
     return dataframe
 
 
-def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, grouping=None):
+def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, grouping=None, alias=None):
     """
     Grouping can be one of:
         Donor
@@ -96,6 +96,7 @@ def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, gro
         Appeal
         Country
         Cluster
+    Alias is used to name the grouping type column and use it as an index.
     """
     url = build_json_url(middle_part) + '?Appeal=' + str(appeal_id)
 
@@ -106,21 +107,27 @@ def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, gro
     raw_dataframe = fetch_json_as_dataframe(url)
 
     # oddly the JSON of interest is nested inside the "grouping" element
-    return pd.DataFrame.from_records(raw_dataframe.grouping.values)
+    processed_frame = pd.DataFrame.from_records(raw_dataframe.grouping.values)
+
+    if alias:
+        processed_frame = processed_frame.rename(columns={'type': alias, 'amount': middle_part})
+        processed_frame = processed_frame.set_index(alias)
+
+    return processed_frame
 
 
-def fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping=None):
+def fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping=None, alias=None):
     """
     Committed or contributed funds, including carry over from previous years
     """
-    return fetch_grouping_type_json_for_appeal_as_dataframe("funding", appeal_id, grouping)
+    return fetch_grouping_type_json_for_appeal_as_dataframe("funding", appeal_id, grouping, alias)
 
 
-def fetch_pledges_json_for_appeal_as_dataframe(appeal_id, grouping=None):
+def fetch_pledges_json_for_appeal_as_dataframe(appeal_id, grouping=None, alias=None):
     """
     Contains uncommitted pledges, not funding that has already processed to commitment or contribution stages
     """
-    return fetch_grouping_type_json_for_appeal_as_dataframe("pledges", appeal_id, grouping)
+    return fetch_grouping_type_json_for_appeal_as_dataframe("pledges", appeal_id, grouping, alias)
 
 
 if __name__ == "__main__":

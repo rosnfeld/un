@@ -21,10 +21,8 @@ organizations = organizations.set_index('name')
 organizations_type = organizations.type
 
 # query funding, which includes "carry over" from previous years
-funding_by_recipient = fts_queries.fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping='Recipient')
-# set up the index for the join on organisation name
-funding_by_recipient = funding_by_recipient.rename(columns={'type': 'organisation', 'amount': 'funding_amount'})
-funding_by_recipient = funding_by_recipient.set_index('organisation')
+funding_by_recipient =\
+    fts_queries.fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping='Recipient', alias='organisation')
 
 # join the funding with the organization type
 joined = funding_by_recipient.join(organizations_type)
