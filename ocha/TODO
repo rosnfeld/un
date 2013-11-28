@@ -12,6 +12,10 @@ Figure out CERF/CHF/ERF funding
   - look at ERF funding by cluster for a given appeal (FY390-FY490)
     - looks like CHD is missing an item in this range for "Safety and Security of Staff and Operations"
 
+Re-organize scripts
+ - create a fts subdirectory, move everything there?
+ - shorten script names given the amount of redundancy/repetition?
+
 Ask CJ if splitting out carry-over is of interest
 
 Make some sort of entity relationship diagram to help document FTS data? It seems something roughly like:
