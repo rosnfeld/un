@@ -6,11 +6,12 @@ Figure out CERF/CHF/ERF funding
   - yes, these seem to house CERF data
     - you need to look at raw contributions, not funding, to find answers though..?
 - CHFs and ERFs are related to countries
-  - ** do they possibly show up in contributions as donors? yes! so does CERF
+  - do they possibly show up in contributions as donors? yes! so does CERF
+  - so we can see money flowing from these pools, though maybe not always to these pools?
 - next step is to try and address CHD items using this new discovery
   - look at CERF funding by cluster for a given appeal (FY240-FY350)
   - look at ERF funding by cluster for a given appeal (FY390-FY490)
-    - looks like CHD is missing an item in this range for "Safety and Security of Staff and Operations"
+    - looks like CHD is missing an item for "Safety and Security of Staff and Operations"
 
 Re-organize scripts
  - create a fts subdirectory, move everything there?
@@ -21,6 +22,8 @@ Ask CJ if splitting out carry-over is of interest
 Make some sort of entity relationship diagram to help document FTS data? It seems something roughly like:
 - countries have emergencies, which have appeals, which have projects (categorized into clusters)
 - donations can be made to projects, which are carried out by organizations
+
+Document column descriptions for each dataframe that can be returned by queries
 
 Abstract data source for pandas objects
 - JSON from web
