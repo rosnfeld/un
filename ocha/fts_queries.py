@@ -80,10 +80,19 @@ def fetch_clusters_json_for_appeal_as_dataframe(appeal_id):
     return fetch_json_as_dataframe(build_json_url('Cluster/appeal/' + str(appeal_id)))
 
 
-def fetch_contributions_json_for_appeal_as_dataframe(appeal_id):
-    dataframe = fetch_json_as_dataframe_with_id(build_json_url('Contribution/appeal/' + str(appeal_id)))
+def fetch_contributions_json_as_dataframe_given_url(url):
+    dataframe = fetch_json_as_dataframe_with_id(url)
     convert_date_columns_from_string_to_timestamp(dataframe, ['decision_date'])
     return dataframe
+
+
+def fetch_contributions_json_for_appeal_as_dataframe(appeal_id):
+    return fetch_contributions_json_as_dataframe_given_url(build_json_url('Contribution/appeal/' + str(appeal_id)))
+
+
+def fetch_contributions_json_for_emergency_as_dataframe(emergency_id):
+    return fetch_contributions_json_as_dataframe_given_url(
+        build_json_url('Contribution/emergency/' + str(emergency_id)))
 
 
 def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, grouping=None, alias=None):
