@@ -1,29 +1,30 @@
 Start to look at what a first draft generic CSV format would be for CKAN
 - based more on CHD or existing FTS reports?
 
-Figure out CERF/CHF/ERF funding
-- perhaps appeal 1009 / emergency 15451, highlighted by your data validation, are relevant?
-  - yes, these seem to house CERF data
-    - you need to look at raw contributions, not funding, to find answers though..?
-- CHFs and ERFs are related to countries
-  - do they possibly show up in contributions as donors? yes! so does CERF
-  - so we can see money flowing from these pools, though maybe not always to these pools?
-- next step is to try and address CHD items using this new discovery
-  - look at CERF funding by cluster for a given appeal (FY240-FY350)
-  - look at ERF funding by cluster for a given appeal (FY390-FY490)
-    - looks like CHD is missing an item for "Safety and Security of Staff and Operations"
-
 Re-organize scripts
  - create a fts subdirectory, move everything there?
  - shorten script names given the amount of redundancy/repetition?
+
+Document column descriptions for each dataframe that can be returned by queries
+
+Perhaps unify appeal vs emergency handling in script args by making users pass in kwargs?
+  - appeal_id=1234 vs emergency_id=9876, or similar, then build URL based on what kwarg was used
+
+Centralize string constants in one place
+ - fts_strings.py?
 
 Ask CJ if splitting out carry-over is of interest
 
 Make some sort of entity relationship diagram to help document FTS data? It seems something roughly like:
 - countries have emergencies, which have appeals, which have projects (categorized into clusters)
+  - actually, I now think the emergency/appeal link is not there
+    - maybe an emergency _can_ have an appeal but does not have to?
 - donations can be made to projects, which are carried out by organizations
+- this doesn't always seem to be true
+  - e.g. there are emergencies (e.g. Madagascar 2013) that don't have appeals, but do have contributions
 
-Document column descriptions for each dataframe that can be returned by queries
+Ask FTS they handle duplicates
+- contributions 201359 and 201360 (for appeal 994) look suspiciously similar to me
 
 Abstract data source for pandas objects
 - JSON from web
@@ -47,3 +48,20 @@ Create a demo FTS report D from this data
 
 Do some data validation
  - make sure there are country entries for all appeals (you already found one case where this was missing!)
+
+Figure out CERF/CHF/ERF funding
+- perhaps appeal 1009 / emergency 15451, highlighted by your data validation, are relevant?
+  - yes, these seem to house CERF data
+    - you need to look at raw contributions, not funding, to find answers though..?
+- CHFs and ERFs are related to countries
+  - do they possibly show up in contributions as donors? yes! so does CERF
+  - so we can see money flowing from these pools, though maybe not always to these pools?
+- next step is to try and address CHD items using this new discovery
+  - look at CERF funding by cluster for a given appeal (FY240-FY350)
+  - look at ERF funding by cluster for a given appeal (FY390-FY490)
+    - looks like CHD is missing an item for "Safety and Security of Staff and Operations"
+  - FY380 ERF: Emergency Response Fund contributions by donor (Total)
+    - this says "Appeal", but I don't think current donations are attached to an appeal for a lot of the ERF countries
+      - Ethiopia is a good example here, it has a current Emergency but no current Appeal
+    - so let's do this by emergency id, not appeal id
+- ok, looks like I have the basics of this down, I can replicate most numbers (all I've tried on Pooled Fund reports
