@@ -1,5 +1,5 @@
 """
-Take in an emergency ID and generate a report on ERF donations:
+Take in an emergency ID and generate a report on ERF donations (should cover CHD FY380):
 Donor
 ERF Commitment USD
 ERF Paid contribution
