@@ -71,7 +71,16 @@ def produce_projects_csv_for_country(output_dir, country):
     write_dataframe_to_csv(projects_frame, output_dir + 'projects.csv')
 
 
-# TODO contributions
+def produce_contributions_csv_for_country(output_dir, country):
+    # first get all emergencies for this country (could eliminate this duplicative call, but it's not expensive)
+    emergencies = fts_queries.fetch_emergencies_json_for_country_as_dataframe(country)
+    emergency_ids = emergencies.index
+    # then get all contributions corresponding to those emergencies and concatenate into one big frame
+    list_of_contributions = [fts_queries.fetch_contributions_json_for_emergency_as_dataframe(emergency_id)
+                             for emergency_id in emergency_ids]
+    list_of_non_empty_contributions = [contributions for contributions in list_of_contributions if contributions]
+    contributions_frame = pd.concat(list_of_non_empty_contributions)
+    write_dataframe_to_csv(contributions_frame, output_dir + 'contributions.csv')
 
 
 def produce_csvs_for_country(base_output_dir, country):
@@ -82,6 +91,7 @@ def produce_csvs_for_country(base_output_dir, country):
     produce_emergencies_csv_for_country(output_dir, country)
     produce_appeals_csv_for_country(output_dir, country)
     produce_projects_csv_for_country(output_dir, country)
+    produce_contributions_csv_for_country(output_dir, country)
 
 
 if __name__ == "__main__":
