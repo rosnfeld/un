@@ -65,10 +65,10 @@ def produce_projects_csv_for_country(output_dir, country):
     appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
     appeal_ids = appeals.index
     # then get all projects corresponding to those appeals and concatenate into one big frame
-    projects_frames = [fts_queries.fetch_projects_json_for_appeal_as_dataframe(appeal_id) for appeal_id in appeal_ids]
-    projects = pd.concat(projects_frames)
-    # TODO seems that ID is not written... perhaps due to empty project?
-    write_dataframe_to_csv(projects, output_dir + 'projects.csv')
+    list_of_projects = [fts_queries.fetch_projects_json_for_appeal_as_dataframe(appeal_id) for appeal_id in appeal_ids]
+    list_of_non_empty_projects = [projects for projects in list_of_projects if projects]  # the "if" is key
+    projects_frame = pd.concat(list_of_non_empty_projects)
+    write_dataframe_to_csv(projects_frame, output_dir + 'projects.csv')
 
 
 # TODO contributions
