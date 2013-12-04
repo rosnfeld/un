@@ -4,10 +4,10 @@ Come up with CSVs that capture all available from the FTS API
     - Countries.csv
     - Organizations.csv
   - These can be per country (I could also see per-year, or per-country-year):
-    - Emergency.csv
-    - Appeal.csv
+    - Emergencies.csv
+    - Appeals.csv
     - Projects.csv (for all appeals for a given country)
-    - Contributions.csv
+    - Contributions.csv (for all emergencies for a given country, which should capture all appeals, also)
   - These seem duplicative given other data and probably are not required:
     - Cluster (same data is in Projects)
     - Funding/Pledges (same data is in Contributions)
