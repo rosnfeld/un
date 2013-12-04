@@ -13,14 +13,14 @@ import fts_queries
 import os
 import pandas as pd
 
-# TODO extract strings to header section
+# TODO extract strings to header section above the code
 # TODO should all CSV's have "fts" prefix, e.g. 'fts_sectors.csv', and maybe ISO country code if appropriate?
 
 
 def write_dataframe_to_csv(dataframe, path):
     print "Writing", path
     # include the index which is an ID for each of the objects serialized by this script
-    # use Unicode as many non-ASCII characters
+    # use Unicode as many non-ASCII characters present in this data
     dataframe.to_csv(path, index=True, encoding='utf-8')
 
 
