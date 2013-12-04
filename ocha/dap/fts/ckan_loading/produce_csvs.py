@@ -11,6 +11,7 @@ Can be used to produce the following CSV files for upload into CKAN:
 
 import fts_queries
 import os
+import pandas as pd
 
 # TODO extract strings to header section
 # TODO should all CSV's have "fts" prefix, e.g. 'fts_sectors.csv', and maybe ISO country code if appropriate?
@@ -54,16 +55,34 @@ def produce_emergencies_csv_for_country(output_dir, country):
     write_dataframe_to_csv(emergencies, output_dir + 'emergencies.csv')
 
 
+def produce_appeals_csv_for_country(output_dir, country):
+    appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
+    write_dataframe_to_csv(appeals, output_dir + 'appeals.csv')
+
+
+def produce_projects_csv_for_country(output_dir, country):
+    # first get all appeals for this country (could eliminate this duplicative call, but it's not expensive)
+    appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
+    appeal_ids = appeals.index
+    # then get all projects corresponding to those appeals and concatenate into one big frame
+    projects_frames = [fts_queries.fetch_projects_json_for_appeal_as_dataframe(appeal_id) for appeal_id in appeal_ids]
+    projects = pd.concat(projects_frames)
+    # TODO seems that ID is not written... perhaps due to empty project?
+    write_dataframe_to_csv(projects, output_dir + 'projects.csv')
+
+
+# TODO contributions
+
+
 def produce_csvs_for_country(base_output_dir, country):
     output_dir = base_output_dir + '/fts/per_country/' + country + '/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
     produce_emergencies_csv_for_country(output_dir, country)
+    produce_appeals_csv_for_country(output_dir, country)
+    produce_projects_csv_for_country(output_dir, country)
 
-# TODO appeals
-# TODO projects
-# TODO contributions
 
 if __name__ == "__main__":
     # output all CSVs for a given country to '/tmp/'
