@@ -16,7 +16,11 @@ def fetch_json_as_dataframe(url):
 
 
 def fetch_json_as_dataframe_with_id(url):
-    return fetch_json_as_dataframe(url).set_index('id')
+    dataframe = fetch_json_as_dataframe(url)
+    if 'id' in dataframe.columns:
+        return dataframe.set_index('id')
+    else:
+        return dataframe  # happens with an empty result
 
 
 def build_json_url(middle_part):
@@ -70,7 +74,8 @@ def fetch_appeals_json_for_year_as_dataframe(year):
 
 def fetch_projects_json_for_appeal_as_dataframe(appeal_id):
     dataframe = fetch_json_as_dataframe_with_id(build_json_url('Project/appeal/' + str(appeal_id)))
-    convert_date_columns_from_string_to_timestamp(dataframe, ['end_date', 'last_updated_datetime'])
+    if dataframe:  # guard against empty result
+        convert_date_columns_from_string_to_timestamp(dataframe, ['end_date', 'last_updated_datetime'])
     return dataframe
 
 
