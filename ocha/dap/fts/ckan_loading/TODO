@@ -1,3 +1,17 @@
+Generate set of CSVs for each of the countries of interest
+
+Polish CSV production code a bit
+
+Test upload to CKAN
+
+Document column descriptions for each dataframe that can be returned by queries
+
+Perhaps unify appeal vs emergency handling in script args by making users pass in kwargs?
+  - appeal_id=1234 vs emergency_id=9876, or similar, then build URL based on what kwarg was used
+
+
+DONE:
+
 Come up with CSVs that capture all available from the FTS API
   - These will be more or less raw copies from the JSON, and while not super-interesting they seem useful to have:
     - Sectors.csv
@@ -11,8 +25,3 @@ Come up with CSVs that capture all available from the FTS API
   - These seem duplicative given other data and probably are not required:
     - Cluster (same data is in Projects)
     - Funding/Pledges (same data is in Contributions)
-
-Document column descriptions for each dataframe that can be returned by queries
-
-Perhaps unify appeal vs emergency handling in script args by making users pass in kwargs?
-  - appeal_id=1234 vs emergency_id=9876, or similar, then build URL based on what kwarg was used
