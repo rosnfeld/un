@@ -24,6 +24,11 @@ def write_dataframe_to_csv(dataframe, path):
     dataframe.to_csv(path, index=True, encoding='utf-8')
 
 
+def filter_out_empty_dataframes(dataframes):
+    # empty dataframes will fail the "if" test
+    return [frame for frame in dataframes if frame]
+
+
 def produce_sectors_csv(output_dir):
     sectors = fts_queries.fetch_sectors_json_as_dataframe()
     write_dataframe_to_csv(sectors, output_dir + 'sectors.csv')
@@ -66,7 +71,7 @@ def produce_projects_csv_for_country(output_dir, country):
     appeal_ids = appeals.index
     # then get all projects corresponding to those appeals and concatenate into one big frame
     list_of_projects = [fts_queries.fetch_projects_json_for_appeal_as_dataframe(appeal_id) for appeal_id in appeal_ids]
-    list_of_non_empty_projects = [projects for projects in list_of_projects if projects]  # the "if" is key
+    list_of_non_empty_projects = filter_out_empty_dataframes(list_of_projects)
     projects_frame = pd.concat(list_of_non_empty_projects)
     write_dataframe_to_csv(projects_frame, output_dir + 'projects.csv')
 
@@ -78,9 +83,9 @@ def produce_contributions_csv_for_country(output_dir, country):
     # then get all contributions corresponding to those emergencies and concatenate into one big frame
     list_of_contributions = [fts_queries.fetch_contributions_json_for_emergency_as_dataframe(emergency_id)
                              for emergency_id in emergency_ids]
-    list_of_non_empty_contributions = [contributions for contributions in list_of_contributions if contributions]
-    contributions_frame = pd.concat(list_of_non_empty_contributions)
-    write_dataframe_to_csv(contributions_frame, output_dir + 'contributions.csv')
+    list_of_non_empty_contributions = filter_out_empty_dataframes(list_of_contributions)
+    contributions_master_frame = pd.concat(list_of_non_empty_contributions)
+    write_dataframe_to_csv(contributions_master_frame, output_dir + 'contributions.csv')
 
 
 def produce_csvs_for_country(base_output_dir, country):
