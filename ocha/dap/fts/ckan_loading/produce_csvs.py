@@ -26,7 +26,7 @@ def write_dataframe_to_csv(dataframe, path):
 
 def filter_out_empty_dataframes(dataframes):
     # empty dataframes will fail the "if" test
-    return [frame for frame in dataframes if frame]
+    return [frame for frame in dataframes if not frame.empty]
 
 
 def produce_sectors_csv(output_dir):
