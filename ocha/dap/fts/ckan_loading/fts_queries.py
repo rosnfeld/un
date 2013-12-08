@@ -86,7 +86,8 @@ def fetch_clusters_json_for_appeal_as_dataframe(appeal_id):
 
 def fetch_contributions_json_as_dataframe_given_url(url):
     dataframe = fetch_json_as_dataframe_with_id(url)
-    convert_date_columns_from_string_to_timestamp(dataframe, ['decision_date'])
+    if not dataframe.empty:  # guard against empty result
+        convert_date_columns_from_string_to_timestamp(dataframe, ['decision_date'])
     return dataframe
 
 
