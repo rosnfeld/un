@@ -1,8 +1,6 @@
-Generate set of CSVs for each of the countries of interest
-
-Polish CSV production code a bit
-
 Test upload to CKAN
+ - this might need to wait on new release of CKAN?
+ - I've manually uploaded at least one example of each file
 
 Document column descriptions for each dataframe that can be returned by queries
 
@@ -25,3 +23,7 @@ Come up with CSVs that capture all available from the FTS API
   - These seem duplicative given other data and probably are not required:
     - Cluster (same data is in Projects)
     - Funding/Pledges (same data is in Contributions)
+
+Generate set of CSVs for each of the countries of interest
+
+Polish CSV production code a bit
