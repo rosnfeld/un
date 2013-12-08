@@ -113,8 +113,7 @@ def produce_csvs_for_country(base_output_dir, country):
 
 if __name__ == "__main__":
     # output all CSVs for the given countries to '/tmp/'
-    #country_codes = ['COL', 'SSD', 'YEM', 'PAK']  # the set of starter countries for DAP
-    country_codes = ['PAK']  # the set of starter countries for DAP
+    country_codes = ['COL', 'SSD', 'YEM', 'PAK']  # the set of starter countries for DAP
     tmp_output_dir = '/tmp/'
 
     produce_global_csvs(tmp_output_dir)
