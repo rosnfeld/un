@@ -1,3 +1,6 @@
+Include UNLICENSE file if in new repo under OCHA/DAP
+- see https://github.com/OCHA-DAP/ProjectWiki/wiki/Software-Licensing
+
 Test upload to CKAN
  - this might need to wait on new release of CKAN?
  - I've manually uploaded at least one example of each file
