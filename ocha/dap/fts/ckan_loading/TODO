@@ -1,6 +1,12 @@
 Include UNLICENSE file if in new repo under OCHA/DAP
 - see https://github.com/OCHA-DAP/ProjectWiki/wiki/Software-Licensing
 
+Consider what a non-pandas version of this code would be like
+- maybe makes dependencies/maintainability easier for others
+- pulling JSON data from web isn't really any harder
+- writing CSVs isn't much harder
+- uglier for doing things like "fetch all projects for this set of appeals"
+
 Test upload to CKAN
  - this might need to wait on new release of CKAN?
  - I've manually uploaded at least one example of each file
