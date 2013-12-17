@@ -101,11 +101,14 @@ def find_percentage_values_outside_0_to_100():
     """
     Read all indicators that are expressed in percentage terms and confirm values lie between 0% and 100%.
     """
-    # some percentages are okay to be outside the range:
-    # PSP050, PSP060 - population growth rate
-    # PSE150 - age dependency ratio
-    # PSE200 - consumer price inflation
-    excluded_indicators = {'PSP050', 'PSP060', 'PSE150', 'PSE200'}
+    # some percentages are okay to be outside the range
+    excluded_indicators = {
+        'PSP050',  # population growth rate
+        'PSP060',  # population growth rate, again
+        'PVE120',  # education enrollment vs theoretical baseline
+        'PSE150',  # age dependency ratio
+        'PSE200',  # consumer price inflation
+    }
 
     return find_values_out_of_bounds(is_percentage_unit, excluded_indicators, lower_bound=0, upper_bound=100)
 
@@ -126,4 +129,4 @@ if __name__ == "__main__":
     print find_negative_incidence_values()
 
 
-# TODO restructure this to print which indicators are being tested, with what criteria
+# TODO restructure this to print clearly which indicators are being tested, with what criteria
