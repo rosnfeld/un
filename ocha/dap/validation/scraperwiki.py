@@ -22,53 +22,47 @@ def get_value_frame():
     return pd.read_csv(VALUE_CSV)
 
 
-def get_percentage_indicators():
+def is_percentage_unit(unit_string):
     """
     Returns a set of indicator IDs that have percentage units
     """
-    all_indicators = get_indicator_frame()
+    # TODO could definitely be improved, via regular expressions or a lot of different things
 
-    def is_percentage_unit(unit_string):
-        # TODO could definitely be improved, via regular expressions or a lot of different things
-
-        if not isinstance(unit_string, basestring):
-            return False
-
-        if '%' in unit_string:
-            return True
-
-        if 'percentage' in unit_string:
-            return True
-
+    if not isinstance(unit_string, basestring):
         return False
 
-    percentage_indicators = all_indicators[all_indicators.units.apply(is_percentage_unit)]
-    return set(percentage_indicators.index)
+    if '%' in unit_string:
+        return True
+
+    if 'percentage' in unit_string:
+        return True
+
+    return False
 
 
-def get_incidence_indicators():
+def is_incidence_unit(unit_string):
     """
     Returns a set of indicator IDs that are measured by some sort of "count"
     (e.g. #people affected by disasters)
     """
-    all_indicators = get_indicator_frame()
+    # TODO could definitely be improved
 
-    def is_incidence_unit(unit_string):
-        # TODO could definitely be improved
-
-        if not isinstance(unit_string, basestring):
-            return False
-
-        if unit_string in ('uno', 'count', 'thousands', 'millions'):
-            return True
-
-        if ' per ' in unit_string:  # one could argue this is its own category
-            return True
-
+    if not isinstance(unit_string, basestring):
         return False
 
-    incidence_indicators = all_indicators[all_indicators.units.apply(is_incidence_unit)]
-    return set(incidence_indicators.index)
+    if unit_string in ('uno', 'count', 'thousands', 'millions'):
+        return True
+
+    if ' per ' in unit_string:  # one could argue this is its own category
+        return True
+
+    return False
+
+
+def get_indicators_matching_units(criteria_function):
+    all_indicators = get_indicator_frame()
+    matching_indicators = all_indicators[all_indicators.units.apply(criteria_function)]
+    return set(matching_indicators.index)
 
 
 def find_percentage_values_outside_0_to_100():
@@ -76,7 +70,7 @@ def find_percentage_values_outside_0_to_100():
     Read all indicators that are expressed in percentage terms and confirm values lie between 0% and 100%.
     """
     all_values = get_value_frame()
-    percentage_indicators = get_percentage_indicators()
+    percentage_indicators = get_indicators_matching_units(is_percentage_unit)
 
     # some percentages are okay to be outside the range:
     # PSP050, PSP060 - population growth rate
@@ -104,7 +98,7 @@ def find_negative_incidence_values():
     Read all indicators that are expressed in incidence terms and confirm values are not negative.
     """
     all_values = get_value_frame()
-    incidence_indicators = get_incidence_indicators()
+    incidence_indicators = get_indicators_matching_units(is_incidence_unit)
 
     incidence_values = all_values[all_values.indID.apply(lambda x: x in incidence_indicators)]
 
@@ -119,8 +113,8 @@ def find_negative_incidence_values():
 
 
 if __name__ == "__main__":
-    # print "Percentage Values outside 0% to 100%:"
-    # print find_percentage_values_outside_0_to_100()
+    print "Percentage Values outside 0% to 100%:"
+    print find_percentage_values_outside_0_to_100()
 
     print "Incidence Values below 0:"
     print find_negative_incidence_values()
