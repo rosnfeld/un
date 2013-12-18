@@ -2,6 +2,9 @@
 Just some initial poking around with ScraperWiki data
 """
 
+# TODO restructure this to print clearly which indicators are being tested, with what criteria
+# TODO should I join the frames together into one master denormalized frame? slower but easier to follow/work with
+
 import pandas as pd
 
 BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2013-12-13/'
@@ -127,6 +130,3 @@ if __name__ == "__main__":
     print
     print "Incidence Values below 0:"
     print find_negative_incidence_values()
-
-
-# TODO restructure this to print clearly which indicators are being tested, with what criteria
