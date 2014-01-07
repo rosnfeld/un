@@ -1,0 +1,10 @@
+It might be nice to have a master list of countries and years
+ - in the meantime, use the union of all countries and years in the dataset
+ - of course, some countries (e.g. SSD) don't exist in all years
+ - and some datasets don't have all years
+ - so how would we structure this..?
+   - countries have a start and possibly end year
+   - datasets have start and possibly end year
+     - doesn't handle gaps, which might be legitimate
+     - some datasets may only be captured every few years
+   - if country and dataset should be present in a given year, make sure the data is there
