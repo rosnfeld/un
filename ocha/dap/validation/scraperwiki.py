@@ -7,7 +7,7 @@ Just some initial poking around with ScraperWiki data
 
 import pandas as pd
 
-BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2013-12-13/'
+BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2014-01-06/'
 DATASET_CSV = BASE_DIR + 'dataset.csv'
 INDICATOR_CSV = BASE_DIR + 'indicator.csv'
 VALUE_CSV = BASE_DIR + 'value.csv'
