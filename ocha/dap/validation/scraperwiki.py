@@ -3,7 +3,7 @@ Just some initial poking around with ScraperWiki data
 """
 
 # TODO restructure this to print clearly which indicators are being tested, with what criteria
-# TODO should I join the frames together into one master denormalized frame? slower but easier to follow/work with
+# TODO use master denormalized frame? slower but easier to follow/work with
 
 import pandas as pd
 
@@ -23,6 +23,35 @@ def get_indicator_frame():
 
 def get_value_frame():
     return pd.read_csv(VALUE_CSV)
+
+
+def get_joined_frame():
+    """
+    Combine the dataset/indicator/value frames into one master frame.
+    Resulting columns are:
+    dsID - the dataset ID
+    region - seems to mostly be ISO country codes, though maybe not always
+    indID - the indicator ID
+    period - the time period in question, can be a date, a year, or year/P?Y where ? encodes the period
+        (e.g. every 5 years is P5Y)
+    value - string containing the indicator value
+    is_number - whether to interpret the value as a number
+    source - URL where the original data can be found
+    ds_last_updated - last time the dataset was updated (what does updated mean in this context?)
+    ds_last_scraped - last time the dataset was scraped
+    ds_name - the dataset name
+    ind_name - the indicator name
+    ind_units - the indicator units (these could use some more standardization)
+    """
+    ds = get_dataset_frame()
+    ds = ds.rename(columns=lambda x: "ds_" + x)
+
+    ind = get_indicator_frame()
+    ind = ind.rename(columns=lambda x: "ind_" + x)
+
+    val = get_value_frame()
+
+    return val.join(ds, on='dsID').join(ind, on='indID')
 
 
 def is_percentage_unit(unit_string):
