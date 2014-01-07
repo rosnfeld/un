@@ -1,3 +1,8 @@
+Report on "gap years" in the middle of a dataset for a given country
+
+Report on unusual year-over-year changes in a dataset
+
+
 It might be nice to have a master list of countries and years
  - in the meantime, use the union of all countries and years in the dataset
  - of course, some countries (e.g. SSD) don't exist in all years
