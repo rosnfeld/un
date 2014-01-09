@@ -2,7 +2,6 @@
 Just some initial poking around with ScraperWiki data
 """
 
-# TODO restructure this to print clearly which indicators are being tested, with what criteria
 # TODO use master denormalized frame? slower but easier to follow/work with
 
 import pandas as pd
@@ -101,30 +100,43 @@ def get_indicators_matching_units(criteria_function, excluded_indicators=set()):
     return set(matching_indicators.index) - excluded_indicators
 
 
-def find_values_out_of_bounds(indicators, lower_bound=None, upper_bound=None):
+class BoundsReport(object):
     """
-    Return those values that are outside the specified bounds for the specified indicators
+    Report on values outside the specified bounds for the specified indicators
     """
-    all_values = get_value_frame()
-    indicator_values = all_values[all_values.indID.apply(lambda x: x in indicators)]
+    def __init__(self, subject, indicators, lower_bound=None, upper_bound=None):
+        self.subject = subject
+        self.indicators = indicators
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
 
-    # need to convert value column, as for some indicators it can be string but for these it should be numeric
-    # TODO use "is_number" column for this?
-    indicator_values = indicator_values.copy()
-    indicator_values.value = indicator_values.value.astype(float)
+        all_values = get_value_frame()
+        indicator_values = all_values[all_values.indID.apply(lambda x: x in self.indicators)]
 
-    violations_series = pd.Series(False, index=indicator_values.index)
+        # need to convert value column, as for some indicators it can be string but for these it should be numeric
+        # TODO use "is_number" column for this?
+        indicator_values = indicator_values.copy()
+        indicator_values.value = indicator_values.value.astype(float)
 
-    if lower_bound:
-        violations_series |= indicator_values.value < lower_bound
+        violations_series = pd.Series(False, index=indicator_values.index)
 
-    if upper_bound:
-        violations_series |= indicator_values.value > upper_bound
+        if self.lower_bound:
+            violations_series |= indicator_values.value < self.lower_bound
 
-    return indicator_values[violations_series]
+        if self.upper_bound:
+            violations_series |= indicator_values.value > self.upper_bound
+
+        self.violation_values = indicator_values[violations_series]
+
+    def __str__(self):
+        output = "Bounds Report: " + self.subject + '\n'
+        output += 'Indicators: ' + str(sorted(self.indicators)) + '\n'
+        output += 'Bounds: (' + str(self.lower_bound) + ',' + str(self.upper_bound) + ')\n'
+        output += 'Violations: ' + str(self.violation_values) + '\n\n'
+        return output
 
 
-def find_percentage_values_outside_0_to_100():
+def report_on_percentage_values_outside_0_to_100():
     """
     Read all indicators that are expressed in percentage terms and confirm values lie between 0% and 100%.
     """
@@ -139,20 +151,17 @@ def find_percentage_values_outside_0_to_100():
 
     indicators = get_indicators_matching_units(is_percentage_unit, excluded_indicators)
 
-    return find_values_out_of_bounds(indicators, lower_bound=0, upper_bound=100)
+    print BoundsReport('Percentage Values', indicators, lower_bound=0, upper_bound=100)
 
 
-def find_negative_incidence_values():
+def report_on_negative_incidence_values():
     """
     Read all indicators that are expressed in incidence terms and confirm values are not negative.
     """
     indicators = get_indicators_matching_units(is_incidence_unit)
-    return find_values_out_of_bounds(indicators, lower_bound=0)
+    print BoundsReport('Incidence Values', indicators, lower_bound=0)
 
 
-if __name__ == "__main__":
-    print "Percentage Values outside 0% to 100%:"
-    print find_percentage_values_outside_0_to_100()
-    print
-    print "Incidence Values below 0:"
-    print find_negative_incidence_values()
+if __name__ == '__main__':
+    report_on_percentage_values_outside_0_to_100()
+    report_on_negative_incidence_values()
