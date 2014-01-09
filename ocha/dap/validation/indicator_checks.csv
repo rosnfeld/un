@@ -90,8 +90,8 @@ PSE210,GINI index,uno,A percentage-type score,0,100
 _International migrant stock (% of population),International migrant stock ,% of population,,0,100
 PVH080,"Mortality rate, adult, female ","per 1,000 female adults",,0,1000
 PVH090,"Mortality rate, adult, male ","per 1,000 male adults",,0,1000
-PSE140,"Age dependency ratio, old ",% of working-age population,,0,100
-PSE150,"Age dependency ratio, young ",% of working-age population,,0,100
+PSE140,"Age dependency ratio, old ",% of working-age population,Note this value can be > 100,0,
+PSE150,"Age dependency ratio, young ",% of working-age population,Note this value can be > 100,0,
 PSP060,Population growth ,annual %,Really a delta type value,,
 "_Population, total","Population, total",uno,,0,
 PVL010,Number of airports,count,,0,
