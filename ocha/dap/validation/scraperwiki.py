@@ -2,8 +2,6 @@
 Just some initial poking around with ScraperWiki data
 """
 
-# TODO use master denormalized frame? slower but easier to follow/work with
-
 import pandas as pd
 
 BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2014-01-06/'
@@ -59,116 +57,30 @@ def get_joined_frame():
 def get_checks_frame():
     return pd.read_csv(CHECKS_CSV, index_col='indID')
 
-
-def is_percentage_unit(unit_string):
+class IndicatorValueReport(object):
     """
-    Returns a set of indicator IDs that have percentage units
+    Check that indicator values fall within prescribed bounds
     """
-    # TODO could definitely be improved, via regular expressions or a lot of different things
+    def __init__(self):
+        data_frame = get_joined_frame()
+        numeric_data = data_frame[data_frame.is_number == 1]
 
-    if not isinstance(unit_string, basestring):
-        return False
+        checks = get_checks_frame()
+        # we already have these columns in the other frame
+        del checks['name']
+        del checks['units']
 
-    if '%' in unit_string:
-        return True
+        joined = numeric_data.join(checks, on='indID')
 
-    if 'percentage' in unit_string:
-        return True
+        joined = joined.copy()  # need to make fresh copy to overwrite column with different type
+        joined.value = joined.value.astype(float)
 
-    return False
+        violations_series = pd.Series(False, index=joined.index)
+        violations_series |= joined.value < joined.lowerBound
+        violations_series |= joined.value > joined.upperBound
 
-
-def is_incidence_unit(unit_string):
-    """
-    Returns a set of indicator IDs that are measured by some sort of "count"
-    (e.g. #people affected by disasters)
-    """
-    # TODO could definitely be improved
-
-    if not isinstance(unit_string, basestring):
-        return False
-
-    if unit_string in ('uno', 'count', 'thousands', 'millions'):
-        return True
-
-    if ' per ' in unit_string:  # one could argue this is its own category
-        return True
-
-    return False
-
-
-def get_indicators_matching_units(criteria_function, excluded_indicators=set()):
-    """
-    Return the set of indicator IDs that match a given criteria function on the indicator units
-    (but allow for manual exclusions)
-    """
-    all_indicators = get_indicator_frame()
-    matching_indicators = all_indicators[all_indicators.units.apply(criteria_function)]
-    return set(matching_indicators.index) - excluded_indicators
-
-
-class BoundsReport(object):
-    """
-    Report on values outside the specified bounds for the specified indicators
-    """
-    def __init__(self, subject, indicators, lower_bound=None, upper_bound=None):
-        self.subject = subject
-        self.indicators = indicators
-        self.lower_bound = lower_bound
-        self.upper_bound = upper_bound
-
-        all_values = get_value_frame()
-        indicator_values = all_values[all_values.indID.apply(lambda x: x in self.indicators)]
-
-        # need to convert value column, as for some indicators it can be string but for these it should be numeric
-        # TODO use "is_number" column for this?
-        indicator_values = indicator_values.copy()
-        indicator_values.value = indicator_values.value.astype(float)
-
-        violations_series = pd.Series(False, index=indicator_values.index)
-
-        if self.lower_bound:
-            violations_series |= indicator_values.value < self.lower_bound
-
-        if self.upper_bound:
-            violations_series |= indicator_values.value > self.upper_bound
-
-        self.violation_values = indicator_values[violations_series]
-
-    def __str__(self):
-        output = "Bounds Report: " + self.subject + '\n'
-        output += 'Indicators: ' + str(sorted(self.indicators)) + '\n'
-        output += 'Bounds: (' + str(self.lower_bound) + ',' + str(self.upper_bound) + ')\n'
-        output += 'Violations: ' + str(self.violation_values) + '\n\n'
-        return output
-
-
-def build_report_on_percentage_values_outside_0_to_100():
-    """
-    Read all indicators that are expressed in percentage terms and confirm values lie between 0% and 100%.
-    """
-    # some percentages are okay to be outside the range
-    excluded_indicators = {
-        'PSP050',  # population growth rate
-        'PSP060',  # population growth rate, again
-        'PVE120',  # education enrollment vs theoretical baseline
-        'PSE150',  # age dependency ratio
-        'PSE200',  # consumer price inflation
-    }
-
-    indicators = get_indicators_matching_units(is_percentage_unit, excluded_indicators)
-
-    return BoundsReport('Percentage Values', indicators, lower_bound=0, upper_bound=100)
-
-
-def build_report_on_negative_incidence_values():
-    """
-    Read all indicators that are expressed in incidence terms and confirm values are not negative.
-    """
-    indicators = get_indicators_matching_units(is_incidence_unit)
-    return BoundsReport('Incidence Values', indicators, lower_bound=0)
+        self.violation_values = joined[violations_series]
 
 
 if __name__ == '__main__':
-    print build_report_on_percentage_values_outside_0_to_100()
-    print build_report_on_negative_incidence_values()
+    print IndicatorValueReport().violation_values
