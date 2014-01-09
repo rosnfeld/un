@@ -45,7 +45,7 @@ PVH140,"Children under five mortality rate per 1,000 live births",,Units should 
 PVE130,Total net enrolment ratio in primary education,both sexes,Units should be percentage?,0,100
 PVN050,Children under 5 moderately or severely underweight,percentage,,0,100
 PCX080,Fixed telephone lines per 100 inhabitants,,Units should be percentage?,0,100
-PCX051,Mobile cellular subscriptions per 100 inhabitants,,Units should be percentage?,0,100
+PCX051,Mobile cellular subscriptions per 100 inhabitants,,Units should be percentage? Note this value can be > 100,0,
 _Internet users per 100 inhabitants,Internet users per 100 inhabitants,,Units should be percentage?,0,100
 "_Population undernourished, millions",Population undernourished,millions,,0,
 PCH090,Routine EPI vaccines financed by government,%,,0,100
@@ -76,7 +76,7 @@ PSP110,Population in urban agglomerations of more than 1 million,uno,,0,
 PSE200,"Inflation, consumer prices ",annual %,Really a delta type value,,
 PVL030,"Roads, total network ",km,,0,
 PVL040,Rail lines ,total route-km,,0,
-PCX090,Mobile cellular subscriptions ,per 100 people,,0,100
+PCX090,Mobile cellular subscriptions ,per 100 people,Note this value can be > 100,0,
 PCX100,Internet users ,per 100 people,,0,100
 PCX130,Logistics performance index: Overall ,1=low to 5=high,Useful units field,1,5
 PSE130,"Household final consumption expenditure, PPP ",constant 2005 international $,,0,
