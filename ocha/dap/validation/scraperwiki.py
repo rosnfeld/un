@@ -136,7 +136,7 @@ class BoundsReport(object):
         return output
 
 
-def report_on_percentage_values_outside_0_to_100():
+def build_report_on_percentage_values_outside_0_to_100():
     """
     Read all indicators that are expressed in percentage terms and confirm values lie between 0% and 100%.
     """
@@ -151,17 +151,17 @@ def report_on_percentage_values_outside_0_to_100():
 
     indicators = get_indicators_matching_units(is_percentage_unit, excluded_indicators)
 
-    print BoundsReport('Percentage Values', indicators, lower_bound=0, upper_bound=100)
+    return BoundsReport('Percentage Values', indicators, lower_bound=0, upper_bound=100)
 
 
-def report_on_negative_incidence_values():
+def build_report_on_negative_incidence_values():
     """
     Read all indicators that are expressed in incidence terms and confirm values are not negative.
     """
     indicators = get_indicators_matching_units(is_incidence_unit)
-    print BoundsReport('Incidence Values', indicators, lower_bound=0)
+    return BoundsReport('Incidence Values', indicators, lower_bound=0)
 
 
 if __name__ == '__main__':
-    report_on_percentage_values_outside_0_to_100()
-    report_on_negative_incidence_values()
+    print build_report_on_percentage_values_outside_0_to_100()
+    print build_report_on_negative_incidence_values()
