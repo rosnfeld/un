@@ -91,26 +91,21 @@ def is_incidence_unit(unit_string):
     return False
 
 
-def get_indicators_matching_units(criteria_function):
+def get_indicators_matching_units(criteria_function, excluded_indicators=set()):
     """
     Return the set of indicator IDs that match a given criteria function on the indicator units
+    (but allow for manual exclusions)
     """
     all_indicators = get_indicator_frame()
     matching_indicators = all_indicators[all_indicators.units.apply(criteria_function)]
-    return set(matching_indicators.index)
+    return set(matching_indicators.index) - excluded_indicators
 
 
-def find_values_out_of_bounds(units_criteria_function, excluded_indicators=None, lower_bound=None, upper_bound=None):
+def find_values_out_of_bounds(indicators, lower_bound=None, upper_bound=None):
     """
-    Return all indicators that match the criteria function (but allow for manual exclusions),
-    and return those that are outside the specified bounds
+    Return those values that are outside the specified bounds for the specified indicators
     """
     all_values = get_value_frame()
-    indicators = get_indicators_matching_units(units_criteria_function)
-
-    if excluded_indicators:
-        indicators -= excluded_indicators
-
     indicator_values = all_values[all_values.indID.apply(lambda x: x in indicators)]
 
     # need to convert value column, as for some indicators it can be string but for these it should be numeric
@@ -142,15 +137,17 @@ def find_percentage_values_outside_0_to_100():
         'PSE200',  # consumer price inflation
     }
 
-    return find_values_out_of_bounds(is_percentage_unit, excluded_indicators, lower_bound=0, upper_bound=100)
+    indicators = get_indicators_matching_units(is_percentage_unit, excluded_indicators)
+
+    return find_values_out_of_bounds(indicators, lower_bound=0, upper_bound=100)
 
 
 def find_negative_incidence_values():
     """
     Read all indicators that are expressed in incidence terms and confirm values are not negative.
     """
-
-    return find_values_out_of_bounds(is_incidence_unit, lower_bound=0)
+    indicators = get_indicators_matching_units(is_incidence_unit)
+    return find_values_out_of_bounds(indicators, lower_bound=0)
 
 
 if __name__ == "__main__":
