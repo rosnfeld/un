@@ -11,6 +11,9 @@ DATASET_CSV = BASE_DIR + 'dataset.csv'
 INDICATOR_CSV = BASE_DIR + 'indicator.csv'
 VALUE_CSV = BASE_DIR + 'value.csv'
 
+# TODO figure out how to load a file based on relative location to script, put this into some sort of "resources" dir
+CHECKS_CSV = '/home/andrew/git/un/ocha/dap/validation/indicator_checks.csv'
+
 
 def get_dataset_frame():
     return pd.read_csv(DATASET_CSV, index_col='dsID', parse_dates=['last_updated', 'last_scraped'])
@@ -51,6 +54,10 @@ def get_joined_frame():
     val = get_value_frame()
 
     return val.join(ds, on='dsID').join(ind, on='indID')
+
+
+def get_checks_frame():
+    return pd.read_csv(CHECKS_CSV, index_col='indID')
 
 
 def is_percentage_unit(unit_string):
