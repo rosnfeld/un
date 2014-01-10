@@ -57,24 +57,28 @@ def get_joined_frame():
 def get_checks_frame():
     return pd.read_csv(CHECKS_CSV, index_col='indID')
 
+
 class IndicatorValueReport(object):
     """
-    Check that indicator values fall within prescribed bounds
+    Check that indicator values fall within bounds prescribed in external file
     """
     def __init__(self):
+        # load the data provided by ScraperWiki
         data_frame = get_joined_frame()
-        numeric_data = data_frame[data_frame.is_number == 1]
+        # only keep the rows with numeric values, and convert them from string to float
+        numeric_data = data_frame[data_frame.is_number == 1].copy()
+        numeric_data.value = numeric_data.value.astype(float)
 
+        # load the external file describing checks for each indicator
         checks = get_checks_frame()
         # we already have these columns in the other frame
         del checks['name']
         del checks['units']
 
+        # join these two frames together, so upper/lower bounds are associated with values
         joined = numeric_data.join(checks, on='indID')
 
-        joined = joined.copy()  # need to make fresh copy to overwrite column with different type
-        joined.value = joined.value.astype(float)
-
+        # check for violations
         violations_series = pd.Series(False, index=joined.index)
         violations_series |= joined.value < joined.lowerBound
         violations_series |= joined.value > joined.upperBound
