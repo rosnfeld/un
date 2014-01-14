@@ -1,7 +1,15 @@
+Continue analyzing unusual year-over-year changes in a dataset
+
 Report on "gap years" in the middle of a dataset for a given country
 
-Report on unusual year-over-year changes in a dataset
+Look at dataset correlations
+ - upper bound to make sure datasets aren't copies of each other
+ - lower bounds to make sure that datasets that are supposed to be related are in fact similar
+ - can't specify same way as before, as pairwise combinations are numerous
 
+Nice metadata to have:
+- better units for each indicator
+- better "frequency" for each indicator (quarterly, annual, every 5 years, etc)
 
 It might be nice to have a master list of countries and years
  - in the meantime, use the union of all countries and years in the dataset
