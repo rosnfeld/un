@@ -58,16 +58,21 @@ def get_checks_frame():
     return pd.read_csv(CHECKS_CSV, index_col='indID')
 
 
+def get_numeric_version(dataframe):
+    # only keep the rows with numeric values, and convert them from string to float
+    numeric_data = dataframe[dataframe.is_number == 1].copy()
+    numeric_data.value = numeric_data.value.astype(float)
+    return numeric_data
+
+
 class IndicatorValueReport(object):
     """
     Check that indicator values fall within bounds prescribed in external file
     """
     def __init__(self):
-        # load the data provided by ScraperWiki
+        # load the data provided by ScraperWiki, and subset to the numeric-valued indicators
         data_frame = get_joined_frame()
-        # only keep the rows with numeric values, and convert them from string to float
-        numeric_data = data_frame[data_frame.is_number == 1].copy()
-        numeric_data.value = numeric_data.value.astype(float)
+        numeric_data = get_numeric_version(data_frame)
 
         # load the external file describing checks for each indicator
         checks = get_checks_frame()
@@ -80,11 +85,58 @@ class IndicatorValueReport(object):
 
         # check for violations
         violations_series = pd.Series(False, index=joined.index)
-        violations_series |= joined.value < joined.lowerBound
-        violations_series |= joined.value > joined.upperBound
+        violations_series |= joined.value < joined.valueLowerBound
+        violations_series |= joined.value > joined.valueUpperBound
+
+        self.violation_values = joined[violations_series]
+
+
+def get_timeseries_list(dataframe):
+    """
+    Takes either a values frame or a joined frame and returns a list of (many) frames, one for each
+    (indID, region) pair, sorted by period.
+    """
+    return [group.sort('period') for key, group in dataframe.groupby(['indID', 'region'])]
+
+
+class IndicatorValueChangeReport(object):
+    """
+    Check that changes in indicator values fall within bounds prescribed in external file
+    """
+    def __init__(self):
+        # load the data provided by ScraperWiki, and subset to the numeric-valued indicators
+        data_frame = get_joined_frame()
+        numeric_data = get_numeric_version(data_frame)
+
+        # load the external file describing checks for each indicator
+        checks = get_checks_frame()
+        # we already have these columns in the other frame
+        del checks['name']
+        del checks['units']
+
+        # build a timeseries for each indicator/region pair
+        timeseries_list = get_timeseries_list(numeric_data)
+
+        # take percent changes, in time. Note pct_change() is 0 to 1 scale by default, which I prefer,
+        # but "percent" and the pattern already set in the data point to using a 1 to 100 scale.
+        # Percentages have other warts (e.g. x +20% one year and then -20% the next year != x)
+        # but alternatives probably too complicated for this project
+        percent_changes = [100 * timeseries.value.pct_change() for timeseries in timeseries_list]
+
+        # combine changes back into original numeric frame as value_pct_change column
+        percent_changes_series = pd.concat(percent_changes)
+        percent_changes_series.name = 'value_pct_change'
+        data_with_percent_changes = numeric_data.join(percent_changes_series)
+
+        # join in associated bounds
+        joined = data_with_percent_changes.join(checks, on='indID')
+
+        # check for violations on absolute percentage changes
+        violations_series = abs(joined.value_pct_change) > joined.percentChangeBound
 
         self.violation_values = joined[violations_series]
 
 
 if __name__ == '__main__':
-    print IndicatorValueReport().violation_values
+    # print IndicatorValueReport().violation_values
+    print IndicatorValueChangeReport().violation_values
