@@ -1,4 +1,8 @@
-Continue analyzing unusual year-over-year changes in a dataset
+Continue analyzing unusual year-over-year changes in SW dataset
+- for some indicators, it seems that percentage changes are useful, for others, absolute changes are better
+  - ** thus, revisit this design
+- could simply find the max/min percentage changes for each indicator and inspect if sensible
+  - less tedious than inspecting each indicator by hand
 
 Report on "gap years" in the middle of a dataset for a given country
 
