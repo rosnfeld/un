@@ -14,10 +14,10 @@ CH100,Total cost of damage done by disasters,",000$ USD",,0,,
 _WPP2012_MORT_F02_CRUDE_DEATH_RATE,"Crude death rate by major area, region and country, 1950-2100","deaths per 1,000 population",,0,1000,
 PVH050,"Deaths (both sexes combined) by major area, region and country, 1950-2100",thousands,,0,,
 PVH100,"Under-five mortality (both sexes combined) by major area, region and country, 1950-2100","deaths under age five per 1,000 live births",Data is on 5 year cycle,0,1000,50
-PVH010,"Life expectancy at birth (both sexes combined) by major area, region and country, 1950-2100",years,Presumably some reasonable upperBound here,0,,
-PVH150,"Infant mortality rate (both sexes combined) by major area, region and country, 1950-2100","infant deaths per 1,000 live births",,0,1000,
-PSP100,"Percentage of Population Residing in Urban Areas by Major Area, Region and Country, 1950-2050",,,0,100,
-PSP010,"Total population (both sexes combined) by major area, region and country, annually for 1950-2100",thousands,,0,,
+PVH010,"Life expectancy at birth (both sexes combined) by major area, region and country, 1950-2100",years,Presumably some reasonable upperBound here,0,,20
+PVH150,"Infant mortality rate (both sexes combined) by major area, region and country, 1950-2100","infant deaths per 1,000 live births",,0,1000,50
+PSP100,"Percentage of Population Residing in Urban Areas by Major Area, Region and Country, 1950-2050",,On 5 year cycle though not noted that way in period column,0,100,50
+PSP010,"Total population (both sexes combined) by major area, region and country, annually for 1950-2100",thousands,,0,,20
 PSP050,"Average annual rate of population change by major area, region and country, 1950-2100",percentage,Really a delta type value,,,
 PSP070,"Median age by major area, region and country, 1950-2100",years,,0,,
 PSP080,"Population density by major area, region and country, 1950-2100",persons per square km,,0,,
