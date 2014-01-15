@@ -104,15 +104,14 @@ class IndicatorValueChangeReport(object):
     Check that changes in indicator values fall within bounds prescribed in external file
     """
     def __init__(self):
+        self.load_data()
+        self.load_checks()
+        self.compute_violations()
+
+    def load_data(self):
         # load the data provided by ScraperWiki, and subset to the numeric-valued indicators
         data_frame = get_joined_frame()
         numeric_data = get_numeric_version(data_frame)
-
-        # load the external file describing checks for each indicator
-        checks = get_checks_frame()
-        # we already have these columns in the other frame
-        del checks['name']
-        del checks['units']
 
         # build a timeseries for each indicator/region pair
         timeseries_list = get_timeseries_list(numeric_data)
@@ -128,8 +127,20 @@ class IndicatorValueChangeReport(object):
         percent_changes_series.name = 'value_pct_change'
         data_with_percent_changes = numeric_data.join(percent_changes_series)
 
-        # join in associated bounds
-        joined = data_with_percent_changes.join(checks, on='indID')
+        self.data = data_with_percent_changes
+
+    def load_checks(self):
+        # load the external file describing checks for each indicator
+        checks = get_checks_frame()
+        # we already have these columns in the other frame
+        del checks['name']
+        del checks['units']
+
+        self.checks = checks
+
+    def compute_violations(self):
+        # join data with associated bounds
+        joined = self.data.join(self.checks, on='indID')
 
         # check for violations on absolute percentage changes
         violations_series = abs(joined.value_pct_change) > joined.percentChangeBound
