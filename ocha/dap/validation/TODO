@@ -5,6 +5,12 @@ Continue analyzing unusual year-over-year changes in SW dataset
   - less tedious than inspecting each indicator by hand
 
 Report on "gap years" in the middle of a dataset for a given country
+ - one way to find them is to look at "date deltas" and if they aren't all uniform, report
+    - e.g. 1-year delta, 1-year delta, 2-year delta, 1-year delta
+ - for some indicators we may need to make a historical cutoff point
+   - only verify quality after a more recent date
+ - CH070 is annoying in that it doesn't have "zeros", but chooses to have missing data instead
+   - seems if there were no disasters in a given region-year, it doesn't have a row for that region-year
 
 Look at dataset correlations
  - upper bound to make sure datasets aren't copies of each other
