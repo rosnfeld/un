@@ -3,8 +3,9 @@ Just some initial poking around with ScraperWiki data
 """
 
 import pandas as pd
+import numpy as np
 
-BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2014-01-06/'
+BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2014-01-18/'
 DATASET_CSV = BASE_DIR + 'dataset.csv'
 INDICATOR_CSV = BASE_DIR + 'indicator.csv'
 VALUE_CSV = BASE_DIR + 'value.csv'
@@ -148,6 +149,58 @@ class IndicatorValueChangeReport(object):
         self.violation_values = joined[violations_series]
 
 
+def standardize_period(period_value):
+    """
+    An attempt at converting the period column into something more workable
+    """
+    if '/' in period_value:
+        # remove frequency indicator after the slash
+        slash_index = period_value.find('/')
+        period_value = period_value[:slash_index]
+
+    if len(period_value) == 4:
+        # assume end of year
+        period_value += '-12-31'
+
+    return pd.datetools.parse(period_value)
+
+
+class GapTimesReport(object):
+    """
+    Reports on gaps in time series
+    """
+    def __init__(self):
+        # load the data provided by ScraperWiki, and subset to the numeric-valued indicators
+        data_frame = get_joined_frame()
+        numeric_data = get_numeric_version(data_frame)
+        numeric_data['period_end'] = numeric_data.period.apply(standardize_period)
+
+        # build a timeseries for each indicator/region pair
+        timeseries_list = get_timeseries_list(numeric_data)
+
+        deviations = []
+
+        for timeseries in timeseries_list:
+            date_diffs = timeseries.period_end.diff()
+
+            # leap-year hack: convert 366 day differences to 365 day differences
+            date_diffs[date_diffs == np.timedelta64(366, 'D')] = np.timedelta64(365, 'D')
+
+            # a little unusual that it's a series, but there can be a tie for most frequent
+            mode_series = date_diffs.mode()
+
+            if mode_series.empty:
+                continue
+
+            deviation_rows = timeseries[date_diffs != mode_series[0]]
+
+            if not deviation_rows.empty:
+                deviations.append(deviation_rows)
+
+        self.violation_values = pd.concat(deviations)
+
+
 if __name__ == '__main__':
     # print IndicatorValueReport().violation_values
-    print IndicatorValueChangeReport().violation_values
+    # print IndicatorValueChangeReport().violation_values
+    print GapTimesReport().violation_values
