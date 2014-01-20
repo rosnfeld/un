@@ -200,6 +200,39 @@ class GapTimesReport(object):
         self.violation_values = pd.concat(deviations)
 
 
+class CorrelationReport(object):
+    """
+    Reports on correlations between various indicators.
+    Creates region-date pairs as the "key" on which to align different indicators.
+    """
+    def __init__(self):
+        # load the data provided by ScraperWiki, and subset to the numeric-valued indicators
+        data_frame = get_joined_frame()
+        numeric_data = get_numeric_version(data_frame)
+        numeric_data['period_end'] = numeric_data.period.apply(standardize_period)
+
+        # build a matrix that has 'region' and 'period_end' as the 2-level index,
+        # a column for each value of 'indID',
+        # and values as per the 'value' column
+        # (yes, this looks like some pandas voodoo)
+        indicator_per_column = numeric_data.set_index(['region', 'period_end', 'indID']).value.unstack()
+
+        # now compute the column-vs-column (indID vs indID) correlation matrix
+        # This will use region-period_end pairs as the 'keys' for alignment,
+        # and only use the data where both indicators "align"
+        # TODO should add a "count" criterion here and throw out correlations based on say, < 20 samples
+        self.indicator_correlations = indicator_per_column.corr()
+
+        # another format for the data: a Series with (ind1, ind2) in the index and correlation as the value
+        ind_corr_series = self.indicator_correlations.unstack()
+
+        self.perfectly_correlated_pairs = []
+
+        for (ind1, ind2), correlation in ind_corr_series.iteritems():
+            if correlation > 0.999 and ind2 > ind1:
+                self.perfectly_correlated_pairs.append((ind1, ind2))
+
+
 if __name__ == '__main__':
     # print IndicatorValueReport().violation_values
     # print IndicatorValueChangeReport().violation_values
