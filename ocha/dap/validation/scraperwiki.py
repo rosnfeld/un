@@ -170,13 +170,11 @@ class GapTimesReport(object):
     Reports on gaps in time series
     """
     def __init__(self):
-        # load the data provided by ScraperWiki, and subset to the numeric-valued indicators
         data_frame = get_joined_frame()
-        numeric_data = get_numeric_version(data_frame)
-        numeric_data['period_end'] = numeric_data.period.apply(standardize_period)
+        data_frame['period_end'] = data_frame.period.apply(standardize_period)
 
         # build a timeseries for each indicator/region pair
-        timeseries_list = get_timeseries_list(numeric_data)
+        timeseries_list = get_timeseries_list(data_frame)
 
         deviations = []
 
