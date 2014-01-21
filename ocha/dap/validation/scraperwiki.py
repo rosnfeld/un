@@ -231,6 +231,25 @@ class CorrelationReport(object):
                 self.perfectly_correlated_pairs.append((ind1, ind2))
 
 
+class CoverageSummaryReport(object):
+    """
+    For each indicator, captures the count of countries/regions with at least data point,
+    and the earliest and latest dates with at least one data point.
+    """
+    def __init__(self):
+        data_frame = get_joined_frame()
+        data_frame['period_end'] = data_frame.period.apply(standardize_period)
+
+        groupby_key = ['indID', 'ind_name']
+
+        region_counts = data_frame.groupby(groupby_key).apply(lambda x: len(x.region.unique()))
+        period_min = data_frame.groupby(groupby_key).period_end.min().astype('datetime64[ns]')
+        period_max = data_frame.groupby(groupby_key).period_end.max().astype('datetime64[ns]')
+
+        self.summary_frame = pd.DataFrame({'region_count': region_counts,
+                                           'period_min': period_min, 'period_max': period_max})
+
+
 if __name__ == '__main__':
     # print IndicatorValueReport().violation_values
     # print IndicatorValueChangeReport().violation_values
