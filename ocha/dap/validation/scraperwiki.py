@@ -5,7 +5,7 @@ Just some initial poking around with ScraperWiki data
 import pandas as pd
 import numpy as np
 
-BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2014-01-18/'
+BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2014-01-21/'
 DATASET_CSV = BASE_DIR + 'dataset.csv'
 INDICATOR_CSV = BASE_DIR + 'indicator.csv'
 VALUE_CSV = BASE_DIR + 'value.csv'
@@ -23,7 +23,7 @@ def get_indicator_frame():
 
 
 def get_value_frame():
-    return pd.read_csv(VALUE_CSV)
+    return pd.read_csv(VALUE_CSV, low_memory=False)
 
 
 def get_joined_frame():
