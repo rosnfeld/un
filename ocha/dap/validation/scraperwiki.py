@@ -4,14 +4,17 @@ Just some initial poking around with ScraperWiki data
 
 import pandas as pd
 import numpy as np
+import os
 
+# TODO put this in an environment variable?
 BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2014-01-21/'
 DATASET_CSV = BASE_DIR + 'dataset.csv'
 INDICATOR_CSV = BASE_DIR + 'indicator.csv'
 VALUE_CSV = BASE_DIR + 'value.csv'
 
-# TODO figure out how to load a file based on relative location to script, put this into some sort of "resources" dir
-CHECKS_CSV = '/home/andrew/git/un/ocha/dap/validation/indicator_checks.csv'
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# maybe put the CSV in some sort of 'resources' subdir?
+CHECKS_CSV = os.path.join(SCRIPT_DIR, 'indicator_checks.csv')
 
 
 def get_dataset_frame():
