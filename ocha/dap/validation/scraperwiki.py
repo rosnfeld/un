@@ -220,8 +220,7 @@ class CorrelationReport(object):
         # now compute the column-vs-column (indID vs indID) correlation matrix
         # This will use region-period_end pairs as the 'keys' for alignment,
         # and only use the data where both indicators "align"
-        # TODO should add a "count" criterion here and throw out correlations based on say, < 20 samples
-        self.indicator_correlations = indicator_per_column.corr()
+        self.indicator_correlations = indicator_per_column.corr(min_periods=20)
 
         # another format for the data: a Series with (ind1, ind2) in the index and correlation as the value
         ind_corr_series = self.indicator_correlations.unstack()
@@ -255,4 +254,5 @@ class CoverageSummaryReport(object):
 if __name__ == '__main__':
     # print IndicatorValueReport().violation_values
     # print IndicatorValueChangeReport().violation_values
-    print GapTimesReport().violation_values
+    # print GapTimesReport().violation_values
+    print CorrelationReport().perfectly_correlated_pairs
