@@ -6,8 +6,7 @@ import pandas as pd
 import numpy as np
 import os
 
-# TODO put this in an environment variable?
-BASE_DIR = '/home/andrew/un/ocha/dap/scraperwiki_2014-01-21/'
+BASE_DIR = os.environ.get('SCRAPERWIKI_DATA_DIR')
 DATASET_CSV = BASE_DIR + 'dataset.csv'
 INDICATOR_CSV = BASE_DIR + 'indicator.csv'
 VALUE_CSV = BASE_DIR + 'value.csv'
