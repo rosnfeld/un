@@ -251,6 +251,28 @@ class CoverageSummaryReport(object):
                                            'period_min': period_min, 'period_max': period_max})
 
 
+class CVReport(object):
+    """
+    For each indicator, looks at the stability of the coefficient of variation (CV) across regions, across time.
+    (I am not yet sure how I feel about this test, but Javier is interested in it)
+    """
+    def __init__(self):
+        values = get_value_frame()
+        numeric_data = get_numeric_version(values)
+
+        grouped = numeric_data.groupby('indID')
+
+        def calculate_cv_stats(indicator_group):
+            # further group by period, then calculate coefficient of variation (across regions) for each period
+            by_period = indicator_group.groupby('period')
+            cv_per_period = by_period.value.std() / by_period.value.mean()
+
+            # then, take the mean and standard deviation of the timeseries of CV values
+            return pd.Series([cv_per_period.mean(), cv_per_period.std()], index=['cv_mean', 'cv_std'])
+
+        self.summary_frame = grouped.apply(calculate_cv_stats)
+
+
 if __name__ == '__main__':
     # print IndicatorValueReport().violation_values
     # print IndicatorValueChangeReport().violation_values
