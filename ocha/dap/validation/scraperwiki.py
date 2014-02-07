@@ -273,6 +273,39 @@ class CVReport(object):
         self.summary_frame = grouped.apply(calculate_cv_stats)
 
 
+class ValueTypeReport(object):
+    """
+    Check that indicator values conform to a specified type
+    """
+    def __init__(self):
+        # load the data provided by ScraperWiki
+        data_frame = get_joined_frame()
+
+        # load the external file describing checks for each indicator
+        checks = get_checks_frame()
+        # we already have these columns in the other frame
+        del checks['name']
+        del checks['units']
+
+        # join these two frames together, so value_types are associated with values
+        joined = data_frame.join(checks, on='indID')
+
+        # check for int violations
+        int_rows = joined[joined.value_type == 'int']
+
+        # parse strings into floats
+        int_values = int_rows.value.astype(float)
+
+        # have to drop rows pre-int-conversion as pandas can't handle missing ints
+        int_values = int_values[int_values.notnull()]
+
+        # do a simple type-conversion check for now
+        # a better check might be to use some sort of "epsilon" threshold
+        self.int_violations = int_rows[int_values.astype(int) != int_values]
+
+        # at some point we could do validation on string values also, like checking that URLs are properly formed
+
+
 if __name__ == '__main__':
     # print IndicatorValueReport().violation_values
     # print IndicatorValueChangeReport().violation_values
