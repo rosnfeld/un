@@ -1,10 +1,10 @@
 """
 Just some initial poking around with ScraperWiki data
 """
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import os
 
 BASE_DIR = os.environ.get('SCRAPERWIKI_DATA_DIR')
@@ -109,11 +109,32 @@ def plot_indicator_heatmap(dataframe, ind_id):
     ind_subset = get_numeric_version(ind_subset)
     ind_subset['period_end'] = ind_subset.period.apply(standardize_period)
 
-    # create a matrix of values arranged by region columns and period rows
+    # create a matrix of values arranged by region columns and period rows (index)
+    # pandas handles the timeseries index nicely, but for plotting with imshow we'll want to transpose this
     ind_crosssection = ind_subset.set_index(['period_end', 'region']).value.unstack()
 
+    plt.figure()
+    axes = plt.gca()
+
+    time_ticks = mpl.dates.date2num(ind_crosssection.index)
+    extent = [time_ticks[0], time_ticks[-1], 0, len(ind_crosssection.columns)]
+
     # plot that matrix, assigning colors based on where values sit in the overall range
-    plt.imshow(ind_crosssection)
+    plt.imshow(ind_crosssection.T, extent=extent, interpolation='none', aspect='auto', origin='lower')
+
+    # this tells matplotlib to interpret the x values as datetimes
+    axes.xaxis_date(tz=ind_crosssection.index.tz)
+
+    regions = ind_crosssection.columns.tolist()
+    axes.yaxis.set_major_locator(mpl.ticker.LinearLocator())
+    axes.yaxis.set_major_formatter(mpl.ticker.IndexFormatter(regions))
+
+    ind = get_indicator_frame()
+    ind_name = ind.name[ind_id]
+    plt.title(ind_name)
+
+    # TODO add a legend that explains color-scale
+
     plt.show()
 
 
