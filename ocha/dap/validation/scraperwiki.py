@@ -4,6 +4,7 @@ Just some initial poking around with ScraperWiki data
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import os
 
 BASE_DIR = os.environ.get('SCRAPERWIKI_DATA_DIR')
@@ -79,7 +80,17 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, region):
     numeric = get_numeric_version(raw_rows)
     numeric['period_end'] = numeric.period.apply(standardize_period)
 
-    numeric.value.plot()
+    timeseries = numeric.set_index('period_end')
+
+    ind = get_indicator_frame()
+    ind_units = ind.units[ind_id]
+
+    title = ind_id + ' for ' + region
+
+    timeseries.value.plot()
+    plt.title(title)
+    plt.ylabel(ind_units)
+    plt.show()
 
 
 class IndicatorValueReport(object):
@@ -338,5 +349,5 @@ if __name__ == '__main__':
     # print GapTimesReport().violation_values
     # print CorrelationReport().perfectly_correlated_pairs
     # print ValueTypeReport().int_violations
-    # plot_indicator_timeseries_for_region(get_value_frame(), 'PVX040', 'SDN')
-    print IsNumberReport().violation_values.indID.value_counts()
+    # print IsNumberReport().violation_values.indID.value_counts()
+    plot_indicator_timeseries_for_region(get_value_frame(), 'PVH150', 'SDN')
