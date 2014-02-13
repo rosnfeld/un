@@ -317,10 +317,26 @@ class ValueTypeReport(object):
         # at some point we could do validation on string values also, like checking that URLs are properly formed
 
 
+class IsNumberReport(object):
+    """
+    Check that the "is_number" column is correct
+    """
+    def __init__(self):
+        data_frame = get_value_frame()
+        # try to convert to numeric type - this method won't raise errors, instead will just write NaNs where it fails
+        value_as_number = data_frame.value.convert_objects(convert_numeric=True)
+        conversion_success_series = ~value_as_number.isnull()
+
+        mismatch_series = (data_frame.is_number == 1) != conversion_success_series
+
+        self.violation_values = data_frame[mismatch_series]
+
+
 if __name__ == '__main__':
     # print IndicatorValueReport().violation_values
     # print IndicatorValueChangeReport().violation_values
     # print GapTimesReport().violation_values
     # print CorrelationReport().perfectly_correlated_pairs
     # print ValueTypeReport().int_violations
-    plot_indicator_timeseries_for_region(get_value_frame(), 'PVX040', 'SDN')
+    # plot_indicator_timeseries_for_region(get_value_frame(), 'PVX040', 'SDN')
+    print IsNumberReport().violation_values.indID.value_counts()
