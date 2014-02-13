@@ -296,9 +296,6 @@ class ValueTypeReport(object):
         # parse strings into floats
         int_values = int_rows.value.astype(float)
 
-        # have to drop rows pre-int-conversion as pandas can't handle missing ints
-        int_values = int_values[int_values.notnull()]
-
         # do a simple type-conversion check for now
         # a better check might be to use some sort of "epsilon" threshold
         self.int_violations = int_rows[int_values.astype(int) != int_values]
@@ -310,4 +307,5 @@ if __name__ == '__main__':
     # print IndicatorValueReport().violation_values
     # print IndicatorValueChangeReport().violation_values
     # print GapTimesReport().violation_values
-    print CorrelationReport().perfectly_correlated_pairs
+    # print CorrelationReport().perfectly_correlated_pairs
+    print ValueTypeReport().int_violations

@@ -1,6 +1,3 @@
-Do a simple "missing values" report that captures all the NaN/empty string/etc rows?
- - it seems unusual to add in a row that has no value
-
 Continue analyzing unusual year-over-year changes in SW dataset
 - for some indicators, it seems that percentage changes are useful, for others, absolute changes are better
   - ** thus, revisit this design
