@@ -68,6 +68,20 @@ def get_numeric_version(dataframe):
     return numeric_data
 
 
+def plot_indicator_timeseries_for_region(dataframe, ind_id, region):
+    raw_rows = dataframe[(dataframe.indID == ind_id) & (dataframe.region == region)]
+
+    if raw_rows.empty:
+        print 'No data for ' + ind_id + ' and ' + region
+        return
+
+    # assume these transformations have not yet been done, should be cheap on a single indicator/region
+    numeric = get_numeric_version(raw_rows)
+    numeric['period_end'] = numeric.period.apply(standardize_period)
+
+    numeric.value.plot()
+
+
 class IndicatorValueReport(object):
     """
     Check that indicator values fall within bounds prescribed in external file
@@ -308,4 +322,5 @@ if __name__ == '__main__':
     # print IndicatorValueChangeReport().violation_values
     # print GapTimesReport().violation_values
     # print CorrelationReport().perfectly_correlated_pairs
-    print ValueTypeReport().int_violations
+    # print ValueTypeReport().int_violations
+    plot_indicator_timeseries_for_region(get_value_frame(), 'PVX040', 'SDN')
