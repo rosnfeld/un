@@ -71,6 +71,30 @@ def get_numeric_version(dataframe):
     return numeric_data
 
 
+def standardize_period(period_value):
+    """
+    An attempt at converting the period column into something more workable
+    """
+    if '/' in period_value:
+        # remove frequency indicator after the slash
+        slash_index = period_value.find('/')
+        period_value = period_value[:slash_index]
+
+    if len(period_value) == 4:
+        # assume end of year
+        period_value += '-12-31'
+
+    return pd.datetools.parse(period_value)
+
+
+def get_timeseries_list(dataframe):
+    """
+    Takes either a values frame or a joined frame and returns a list of (many) frames, one for each
+    (indID, region) pair, sorted by period.
+    """
+    return [group.sort('period') for key, group in dataframe.groupby(['indID', 'region'])]
+
+
 def plot_indicator_timeseries_for_region(dataframe, ind_id, region):
     """
     Generates a simple matplotlib plot of the value timeseries for the given indicator/region
@@ -92,10 +116,12 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, region):
 
     title = ind_id + ' for ' + region
 
+    fig = plt.figure()
     timeseries.value.plot()
     plt.title(title)
     plt.ylabel(ind_units)
-    plt.show()
+
+    return fig
 
 
 def plot_indicator_heatmap(dataframe, ind_id):
@@ -113,7 +139,7 @@ def plot_indicator_heatmap(dataframe, ind_id):
     # pandas handles the timeseries index nicely, but for plotting with imshow we'll want to transpose this
     ind_crosssection = ind_subset.set_index(['period_end', 'region']).value.unstack()
 
-    plt.figure()
+    fig = plt.figure()
     axes = plt.gca()
 
     time_ticks = mpl.dates.date2num(ind_crosssection.index)
@@ -136,7 +162,7 @@ def plot_indicator_heatmap(dataframe, ind_id):
     # add a "legend" that explains how the colors map to values
     plt.colorbar()
 
-    plt.show()
+    return fig
 
 
 class IndicatorValueReport(object):
@@ -163,14 +189,6 @@ class IndicatorValueReport(object):
         violations_series |= joined.value > joined.valueUpperBound
 
         self.violation_values = joined[violations_series]
-
-
-def get_timeseries_list(dataframe):
-    """
-    Takes either a values frame or a joined frame and returns a list of (many) frames, one for each
-    (indID, region) pair, sorted by period.
-    """
-    return [group.sort('period') for key, group in dataframe.groupby(['indID', 'region'])]
 
 
 class IndicatorValueChangeReport(object):
@@ -220,22 +238,6 @@ class IndicatorValueChangeReport(object):
         violations_series = abs(joined.value_pct_change) > joined.percentChangeBound
 
         self.violation_values = joined[violations_series]
-
-
-def standardize_period(period_value):
-    """
-    An attempt at converting the period column into something more workable
-    """
-    if '/' in period_value:
-        # remove frequency indicator after the slash
-        slash_index = period_value.find('/')
-        period_value = period_value[:slash_index]
-
-    if len(period_value) == 4:
-        # assume end of year
-        period_value += '-12-31'
-
-    return pd.datetools.parse(period_value)
 
 
 class GapTimesReport(object):
@@ -397,3 +399,4 @@ if __name__ == '__main__':
     # print ValueTypeReport().int_violations
     # print IsNumberReport().violation_values.indID.value_counts()
     plot_indicator_timeseries_for_region(get_value_frame(), 'PVH150', 'SDN')
+    plt.show()
