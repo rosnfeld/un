@@ -131,9 +131,10 @@ def plot_indicator_heatmap(dataframe, ind_id):
 
     ind = get_indicator_frame()
     ind_name = ind.name[ind_id]
-    plt.title(ind_name)
+    plt.title(ind_id + ": " + ind_name)
 
-    # TODO add a legend that explains color-scale
+    # add a "legend" that explains how the colors map to values
+    plt.colorbar()
 
     plt.show()
 
