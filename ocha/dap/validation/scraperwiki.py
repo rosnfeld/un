@@ -63,13 +63,18 @@ def get_checks_frame():
 
 
 def get_numeric_version(dataframe):
-    # only keep the rows with numeric values, and convert them from string to float
+    """
+    Only keep the rows with numeric values, and convert them from string to float
+    """
     numeric_data = dataframe[dataframe.is_number == 1].copy()
     numeric_data.value = numeric_data.value.astype(float)
     return numeric_data
 
 
 def plot_indicator_timeseries_for_region(dataframe, ind_id, region):
+    """
+    Generates a simple matplotlib plot of the value timeseries for the given indicator/region
+    """
     raw_rows = dataframe[(dataframe.indID == ind_id) & (dataframe.region == region)]
 
     if raw_rows.empty:
@@ -90,6 +95,25 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, region):
     timeseries.value.plot()
     plt.title(title)
     plt.ylabel(ind_units)
+    plt.show()
+
+
+def plot_indicator_heatmap(dataframe, ind_id):
+    """
+    Generates a "heatmap" type image that is useful for spotting the presence of outliers.
+    However, at present it's a little tricky to _identify_ the actual outlier values.
+    """
+    ind_subset = dataframe[dataframe.indID == ind_id]
+
+    # assume these transformations have not yet been done, should be cheap on a single indicator
+    ind_subset = get_numeric_version(ind_subset)
+    ind_subset['period_end'] = ind_subset.period.apply(standardize_period)
+
+    # create a matrix of values arranged by region columns and period rows
+    ind_crosssection = ind_subset.set_index(['period_end', 'region']).value.unstack()
+
+    # plot that matrix, assigning colors based on where values sit in the overall range
+    plt.imshow(ind_crosssection)
     plt.show()
 
 
