@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import os
+import textwrap
 
 BASE_DIR = os.environ.get('SCRAPERWIKI_DATA_DIR')
 DATASET_CSV = BASE_DIR + 'dataset.csv'
@@ -157,7 +158,10 @@ def plot_indicator_heatmap(dataframe, ind_id):
 
     ind = get_indicator_frame()
     ind_name = ind.name[ind_id]
-    plt.title(ind_id + ": " + ind_name)
+
+    # indicator names can be very long, so wrap them if necessary
+    title = ind_id + "\n" + textwrap.fill(ind_name, width=80)
+    plt.title(title, fontsize=12)
 
     # add a "legend" that explains how the colors map to values
     plt.colorbar()
@@ -398,5 +402,15 @@ if __name__ == '__main__':
     # print CorrelationReport().perfectly_correlated_pairs
     # print ValueTypeReport().int_violations
     # print IsNumberReport().violation_values.indID.value_counts()
-    plot_indicator_timeseries_for_region(get_value_frame(), 'PVH150', 'SDN')
-    plt.show()
+    # plot_indicator_timeseries_for_region(get_value_frame(), 'PVH150', 'SDN')
+    # plt.show()
+
+    # save off heatmaps for all numeric indicators
+    joined = get_joined_frame()
+    numeric = get_numeric_version(joined)
+
+    for ind_id in numeric.indID.unique():
+        figure = plot_indicator_heatmap(numeric, ind_id)
+        filename = '/tmp/heatmaps/' + ind_id.replace('/', '_') + '.png'
+        print 'Writing', filename
+        figure.savefig(filename)
