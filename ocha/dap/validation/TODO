@@ -1,3 +1,6 @@
+Compare data sources that report the same indicator
+ - e.g. PVN010 is reported by by both FAO and WorldBank
+
 Continue analyzing unusual year-over-year changes in SW dataset
 - for some indicators, it seems that percentage changes are useful, for others, absolute changes are better
   - ** thus, revisit this design

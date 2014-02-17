@@ -125,12 +125,12 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, region):
     return fig
 
 
-def plot_indicator_heatmap(dataframe, ind_id):
+def plot_indicator_heatmap(dataframe, ind_id, ds_id):
     """
     Generates a "heatmap" type image that is useful for spotting the presence of outliers.
     However, at present it's a little tricky to _identify_ the actual outlier values.
     """
-    ind_subset = dataframe[dataframe.indID == ind_id]
+    ind_subset = dataframe[(dataframe.indID == ind_id) & (dataframe.dsID == ds_id)]
 
     # assume these transformations have not yet been done, should be cheap on a single indicator
     ind_subset = get_numeric_version(ind_subset)
@@ -409,8 +409,10 @@ if __name__ == '__main__':
     joined = get_joined_frame()
     numeric = get_numeric_version(joined)
 
-    for ind_id in numeric.indID.unique():
-        figure = plot_indicator_heatmap(numeric, ind_id)
-        filename = '/tmp/heatmaps/' + ind_id.replace('/', '_') + '.png'
+    for i, row in numeric[['indID', 'dsID']].drop_duplicates().iterrows():
+        ind_id = row['indID']
+        ds_id = row['dsID']
+        figure = plot_indicator_heatmap(numeric, ind_id, ds_id)
+        filename = '/tmp/heatmaps/' + ind_id.replace('/', '_') + '_' + ds_id + '.png'
         print 'Writing', filename
         figure.savefig(filename)
