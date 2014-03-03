@@ -96,15 +96,15 @@ def get_timeseries_list(dataframe):
     return [group.sort('period') for key, group in dataframe.groupby(['indID', 'region'])]
 
 
-def plot_indicator_timeseries_for_region(dataframe, ind_id, region):
+def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region):
     """
-    Generates a simple matplotlib plot of the value timeseries for the given indicator/region
+    Generates a simple matplotlib plot of the value timeseries for the given indicator/dataset/region
     """
-    raw_rows = dataframe[(dataframe.indID == ind_id) & (dataframe.region == region)]
+    raw_rows = dataframe[(dataframe.indID == ind_id) & (dataframe.dsID == ds_id) & (dataframe.region == region)]
 
     if raw_rows.empty:
-        print 'No data for ' + ind_id + ' and ' + region
-        return
+        print 'No data for %s/%s/%s' % (ind_id, ds_id, region)
+        return None
 
     # assume these transformations have not yet been done, should be cheap on a single indicator/region
     numeric = get_numeric_version(raw_rows)
@@ -113,13 +113,15 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, region):
     timeseries = numeric.set_index('period_end')
 
     ind = get_indicator_frame()
+    ind_name = ind.name[ind_id]
     ind_units = ind.units[ind_id]
 
-    title = ind_id + ' for ' + region
+    # indicator names can be very long, so wrap them if necessary
+    title = ind_id + ' for ' + region + "\n" + textwrap.fill(ind_name, width=80)
 
     fig = plt.figure()
     timeseries.value.plot()
-    plt.title(title)
+    plt.title(title, fontsize=12)
     plt.ylabel(ind_units)
 
     return fig
@@ -416,3 +418,4 @@ if __name__ == '__main__':
         filename = '/tmp/heatmaps/' + ind_id.replace('/', '_') + '_' + ds_id + '.png'
         print 'Writing', filename
         figure.savefig(filename)
+        plt.close(figure)
