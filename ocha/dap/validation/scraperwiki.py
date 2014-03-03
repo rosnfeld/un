@@ -122,7 +122,9 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region):
     fig = plt.figure()
     timeseries.value.plot()
     plt.title(title, fontsize=12)
-    plt.ylabel(ind_units)
+
+    if isinstance(ind_units, basestring):
+        plt.ylabel(ind_units)
 
     return fig
 
