@@ -101,7 +101,7 @@ def get_timeseries_list(dataframe):
     return [group.sort('period') for key, group in dataframe.groupby(['indID', 'region'])]
 
 
-def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region):
+def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, comparison_regions=None):
     """
     Generates a simple matplotlib plot of the value timeseries for the given indicator/dataset/region
     """
@@ -110,6 +110,15 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region):
     if raw_rows.empty:
         print 'No data for %s/%s/%s' % (ind_id, ds_id, region)
         return None
+
+    legend = False
+
+    if comparison_regions:
+        regions = [region] + comparison_regions
+        region_filter = lambda x: x in regions
+        raw_rows = dataframe[(dataframe.indID == ind_id) & (dataframe.dsID == ds_id) &
+                             dataframe.region.apply(region_filter)]
+        legend = True
 
     # assume these transformations have not yet been done, should be cheap on a single indicator/region
     numeric = get_numeric_version(raw_rows)
@@ -125,7 +134,8 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region):
     title = ind_id + ' for ' + region + "\n" + textwrap.fill(ind_name, width=80)
 
     fig = plt.figure()
-    timeseries.value.plot()
+
+    timeseries.groupby('region').value.plot(legend=legend)
     plt.title(title, fontsize=12)
 
     if isinstance(ind_units, basestring):

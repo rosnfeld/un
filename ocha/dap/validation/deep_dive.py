@@ -39,6 +39,7 @@ if __name__ == '__main__':
 
     for region in REGIONS_OF_INTEREST:
         dataframe = build_analysis_matrix(region)
+        neighbors = NEIGHBORS[region]
 
         dir_path = os.path.join('/tmp/deep_dive', region)
         if not os.path.exists(dir_path):
@@ -47,7 +48,7 @@ if __name__ == '__main__':
         for i, row in dataframe[['indID', 'dsID']].drop_duplicates().iterrows():
             ind_id = row['indID']
             ds_id = row['dsID']
-            figure = scraperwiki.plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region)
+            figure = scraperwiki.plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, neighbors)
 
             if not figure:
                 continue
