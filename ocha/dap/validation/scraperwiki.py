@@ -88,6 +88,11 @@ def standardize_period(period_value):
     return pd.datetools.parse(period_value)
 
 
+def add_standardized_period(dataframe):
+    dataframe['period_end'] = dataframe.period.apply(standardize_period)
+    return dataframe
+
+
 def get_timeseries_list(dataframe):
     """
     Takes either a values frame or a joined frame and returns a list of (many) frames, one for each
@@ -108,7 +113,7 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region):
 
     # assume these transformations have not yet been done, should be cheap on a single indicator/region
     numeric = get_numeric_version(raw_rows)
-    numeric['period_end'] = numeric.period.apply(standardize_period)
+    add_standardized_period(numeric)
 
     timeseries = numeric.set_index('period_end')
 
@@ -138,7 +143,7 @@ def plot_indicator_heatmap(dataframe, ind_id, ds_id):
 
     # assume these transformations have not yet been done, should be cheap on a single indicator
     ind_subset = get_numeric_version(ind_subset)
-    ind_subset['period_end'] = ind_subset.period.apply(standardize_period)
+    add_standardized_period(ind_subset)
 
     # create a matrix of values arranged by region columns and period rows (index)
     # pandas handles the timeseries index nicely, but for plotting with imshow we'll want to transpose this
@@ -254,7 +259,7 @@ class GapTimesReport(object):
     """
     def __init__(self):
         data_frame = get_joined_frame()
-        data_frame['period_end'] = data_frame.period.apply(standardize_period)
+        add_standardized_period(data_frame)
 
         # build a timeseries for each indicator/region pair
         timeseries_list = get_timeseries_list(data_frame)
@@ -290,7 +295,7 @@ class CorrelationReport(object):
         # load the data provided by ScraperWiki, and subset to the numeric-valued indicators
         data_frame = get_joined_frame()
         numeric_data = get_numeric_version(data_frame)
-        numeric_data['period_end'] = numeric_data.period.apply(standardize_period)
+        add_standardized_period(numeric_data)
 
         # build a matrix that has 'region' and 'period_end' as the 2-level index,
         # a column for each value of 'indID',
@@ -320,7 +325,7 @@ class CoverageSummaryReport(object):
     """
     def __init__(self):
         data_frame = get_joined_frame()
-        data_frame['period_end'] = data_frame.period.apply(standardize_period)
+        add_standardized_period(data_frame)
 
         groupby_key = ['indID', 'ind_name']
 
