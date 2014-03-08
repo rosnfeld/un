@@ -12,6 +12,7 @@ import os
 import matplotlib.pyplot as plt
 import datetime
 import textwrap
+import matplotlib_utils
 
 REGIONS_OF_INTEREST = ['COL', 'KEN']
 NEIGHBORS = {
@@ -65,15 +66,19 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
     ind_units = ind.units[ind_id]
 
     # indicator names can be very long, so wrap them if necessary
-    title = ind_id + ' for ' + region + "\n" + textwrap.fill(ind_name, width=80)
+    title = ind_id + "\n" + textwrap.fill(ind_name, width=80)
 
     fig = plt.figure()
 
+    # TODO: use saturated color for "main" region and less saturated color (or lower alpha) for comparison regions
+    # maybe also list main region 1st
     timeseries.groupby('region').value.plot(legend=legend)
-    plt.title(title, fontsize=12)
+    plt.title(title, fontsize=11)
 
     if isinstance(ind_units, basestring):
         plt.ylabel(ind_units)
+
+    matplotlib_utils.prettyplotlib_style(fig)
 
     return fig
 
