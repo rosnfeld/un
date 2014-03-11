@@ -2,6 +2,19 @@
 Various utilities for working with matplotlib
 """
 
+# recommended palette in "Show Me The Numbers" for plot lines
+COLOR_PALETTE_RGBA =\
+    [
+        (0.30078125, 0.30078125, 0.30078125),  # medium-dark gray
+        (0.6953125, 0.4609375, 0.6953125),     # medium purple
+        (0.9765625, 0.640625, 0.2265625),      # creamsicle
+        (0.94140625, 0.484375, 0.6875),        # pink
+        (0.36328125, 0.64453125, 0.8515625),   # slate blue
+        (0.375, 0.73828125, 0.40625),          # medium green
+        (0.94140625, 0.34375, 0.328125),       # medium red
+        (0.6953125, 0.56640625, 0.1875)        # mustard brown
+    ]
+
 DARK_GRAY = '#282828'
 
 DESIRED_SPINES = ['bottom', 'left']

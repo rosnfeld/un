@@ -10,6 +10,7 @@ Things to do:
 import scraperwiki
 import os
 import matplotlib.pyplot as plt
+import pandas as pd
 import datetime
 import textwrap
 import matplotlib_utils
@@ -36,7 +37,7 @@ def build_analysis_matrix(region):
     return filtered
 
 
-def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, comparison_regions=None):
+def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, comparison_regions):
     """
     Generates a simple matplotlib plot of the value timeseries for the given indicator/dataset/region
     """
@@ -46,20 +47,15 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
         print 'No data for %s/%s/%s' % (ind_id, ds_id, region)
         return None
 
-    legend = False
-
     if comparison_regions:
         regions = [region] + comparison_regions
         region_filter = lambda x: x in regions
         raw_rows = dataframe[(dataframe.indID == ind_id) & (dataframe.dsID == ds_id) &
                              dataframe.region.apply(region_filter)]
-        legend = True
 
     # assume these transformations have not yet been done, should be cheap on a single indicator/region
     numeric = scraperwiki.get_numeric_version(raw_rows)
     scraperwiki.add_standardized_period(numeric)
-
-    timeseries = numeric.set_index('period_end')
 
     ind = scraperwiki.get_indicator_frame()
     ind_name = ind.name[ind_id]
@@ -69,10 +65,21 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
     title = ind_id + "\n" + textwrap.fill(ind_name, width=80)
 
     fig = plt.figure()
+    ax = fig.gca()
 
-    # TODO: use saturated color for "main" region and less saturated color (or lower alpha) for comparison regions
-    # maybe also list main region 1st
-    timeseries.groupby('region').value.plot(legend=legend)
+    ax.set_color_cycle(matplotlib_utils.COLOR_PALETTE_RGBA)
+
+    pivoted = numeric.pivot('period_end', 'region', 'value')
+    pivoted.index = pd.to_datetime(pivoted.index)
+    # this is a little gross as creates the impression of us having more data than we actually do
+    pivoted = pivoted.interpolate(method='time')
+
+    pivoted[region].plot(ax=ax, label=region)
+
+    if comparison_regions:
+        other_regions_pivot = pivoted[pivoted.columns - [region]]
+        other_regions_pivot.plot(ax=ax, alpha=0.6)
+
     plt.title(title, fontsize=11)
 
     if isinstance(ind_units, basestring):
