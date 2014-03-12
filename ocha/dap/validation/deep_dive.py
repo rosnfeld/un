@@ -76,7 +76,12 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
     ds_name = ds.name[ds_id]
 
     # indicator names can be very long, so wrap them if necessary
-    title = ind_id + "\n" + textwrap.fill(ind_name, width=80) + "\n" + ds_name
+    ind_name_wrapped = textwrap.fill(ind_name, width=80)
+
+    # we really only have 3 lines for title, so don't use a newline if the wrap consumed one
+    ds_join = '\n' if '\n' not in ind_name_wrapped else ' / '
+
+    title = ind_id + '\n' + ind_name_wrapped + ds_join + ds_name
 
     fig = plt.figure()
     ax = fig.gca()
