@@ -297,25 +297,28 @@ class CorrelationReport(object):
         numeric_data = get_numeric_version(data_frame)
         add_standardized_period(numeric_data)
 
+        numeric_data['ind_ds_pair'] = numeric_data.indID + '/' + numeric_data.dsID
+
         # build a matrix that has 'region' and 'period_end' as the 2-level index,
-        # a column for each value of 'indID',
+        # a column for each unique indID/dsID pair,
         # and values as per the 'value' column
         # (yes, this looks like some pandas voodoo)
-        indicator_per_column = numeric_data.set_index(['region', 'period_end', 'indID']).value.unstack()
+        indicator_per_column = numeric_data.set_index(['region', 'period_end', 'ind_ds_pair']).value.unstack()
 
-        # now compute the column-vs-column (indID vs indID) correlation matrix
+        # now compute the column-vs-column (ind_ds_pair vs ind_ds_pair) correlation matrix
         # This will use region-period_end pairs as the 'keys' for alignment,
-        # and only use the data where both indicators "align"
+        # and only use the data where both ind_ds_pairs "align"
         self.indicator_correlations = indicator_per_column.corr(min_periods=20)
 
-        # another format for the data: a Series with (ind1, ind2) in the index and correlation as the value
+        # another format for the data:
+        # a Series with (ind_ds_pair1, ind_ds_pair2) in the index and correlation as the value
         ind_corr_series = self.indicator_correlations.unstack()
 
         self.perfectly_correlated_pairs = []
 
-        for (ind1, ind2), correlation in ind_corr_series.iteritems():
-            if correlation > 0.999 and ind2 > ind1:
-                self.perfectly_correlated_pairs.append((ind1, ind2))
+        for (ind_ds_pair1, ind_ds_pair2), correlation in ind_corr_series.iteritems():
+            if correlation > 0.999 and ind_ds_pair2 > ind_ds_pair1:
+                self.perfectly_correlated_pairs.append((ind_ds_pair1, ind_ds_pair2))
 
 
 class CoverageSummaryReport(object):
@@ -408,21 +411,21 @@ if __name__ == '__main__':
     # print IndicatorValueReport().violation_values
     # print IndicatorValueChangeReport().violation_values
     # print GapTimesReport().violation_values
-    # print CorrelationReport().perfectly_correlated_pairs
+    print CorrelationReport().perfectly_correlated_pairs
     # print ValueTypeReport().int_violations
     # print IsNumberReport().violation_values.indID.value_counts()
     # plot_indicator_timeseries_for_region(get_value_frame(), 'PVH150', 'SDN')
     # plt.show()
 
     # save off heatmaps for all numeric indicators
-    joined = get_joined_frame()
-    numeric = get_numeric_version(joined)
-
-    for i, row in numeric[['indID', 'dsID']].drop_duplicates().iterrows():
-        ind_id = row['indID']
-        ds_id = row['dsID']
-        figure = plot_indicator_heatmap(numeric, ind_id, ds_id)
-        filename = '/tmp/heatmaps/' + ind_id.replace('/', '_') + '_' + ds_id + '.png'
-        print 'Writing', filename
-        figure.savefig(filename)
-        plt.close(figure)
+    # joined = get_joined_frame()
+    # numeric = get_numeric_version(joined)
+    #
+    # for i, row in numeric[['indID', 'dsID']].drop_duplicates().iterrows():
+    #     ind_id = row['indID']
+    #     ds_id = row['dsID']
+    #     figure = plot_indicator_heatmap(numeric, ind_id, ds_id)
+    #     filename = '/tmp/heatmaps/' + ind_id.replace('/', '_') + '_' + ds_id + '.png'
+    #     print 'Writing', filename
+    #     figure.savefig(filename)
+    #     plt.close(figure)
