@@ -23,7 +23,7 @@ NEIGHBORS = {
 
 ANALYSIS_START_DATE = datetime.date(1990, 1, 1)
 
-INDICATORS_TO_EXCLUDE = [
+INDICATORS_TO_EXCLUDE = {
     '_Access to electricity (% of population)',  # insufficient history
     '_Land area (sq. km)',  # not really interesting for these countries
     'PCH090',  # insufficient history
@@ -33,7 +33,17 @@ INDICATORS_TO_EXCLUDE = [
     'PVL010',  # insufficient history
     'PVX010',  # insufficient history
     'PVX020',  # insufficient history
-]
+}
+
+TECH_INDICATORS = {
+    '_Fixed-telephone subscriptions per 100 inhabitants',
+    '_Internet users per 100 inhabitants',
+    '_Mobile-cellular subscriptions per 100 inhabitants',
+    'PCX090',
+    'PCX100',
+    'PCX110',
+}
+
 
 def build_analysis_matrix(region):
     joined = scraperwiki.get_joined_frame()
@@ -109,31 +119,38 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
     return fig
 
 
+def plot_indicators_for_region(base_path, region, indicators):
+    """
+    Save off indicator series plots for numeric indicators for region and its neighbors
+    """
+    dataframe = build_analysis_matrix(region)
+    neighbors = NEIGHBORS[region]
+    dir_path = os.path.join(base_path, region)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    for i, row in dataframe[['indID', 'dsID']].drop_duplicates().iterrows():
+        ind_id = row['indID']
+        ds_id = row['dsID']
+
+        if ind_id not in indicators:
+            continue
+
+        figure = plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, neighbors)
+
+        if not figure:
+            continue
+
+        filename = ind_id.replace('/', '_') + '_' + ds_id + '.png'
+        file_path = os.path.join(dir_path, filename)
+        print 'Writing', file_path
+        figure.savefig(file_path)
+        plt.close(figure)
+
+
 if __name__ == '__main__':
-    # save off indicator series plots for all numeric indicators for regions of interest
+    # all indicators
+    ind = scraperwiki.get_indicator_frame()
+    indicators = set(ind.index) - INDICATORS_TO_EXCLUDE
+    for region_of_interest in REGIONS_OF_INTEREST:
+        plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
 
-    for region in REGIONS_OF_INTEREST:
-        dataframe = build_analysis_matrix(region)
-        neighbors = NEIGHBORS[region]
-
-        dir_path = os.path.join('/tmp/deep_dive', region)
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-
-        for i, row in dataframe[['indID', 'dsID']].drop_duplicates().iterrows():
-            ind_id = row['indID']
-            ds_id = row['dsID']
-
-            if ind_id in INDICATORS_TO_EXCLUDE:
-                continue
-
-            figure = plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, neighbors)
-
-            if not figure:
-                continue
-
-            filename = ind_id.replace('/', '_') + '_' + ds_id + '.png'
-            file_path = os.path.join(dir_path, filename)
-            print 'Writing', file_path
-            figure.savefig(file_path)
-            plt.close(figure)
