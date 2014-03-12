@@ -45,6 +45,26 @@ TECH_INDICATORS = {
     'PCX110',
 }
 
+AGE_INDICATORS = {
+    'PSE140',
+    'PSE150',
+    'PSP060',
+    'PSP070',
+    'PVH010',
+    'PVH120',
+    'PVH140',
+    'PVH180',
+    'PVH190',
+}
+
+FOOD_WATER_INDICATORS = {
+    'PVN010',  # will pull in 2 sources
+    'PVN050',
+    'PVW010',
+    '_Population undernourished, percentage',
+    'PVF020',
+}
+
 
 def build_analysis_matrix(region):
     joined = scraperwiki.get_joined_frame()
@@ -156,6 +176,14 @@ if __name__ == '__main__':
     #     plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
     #
 
-    # tech indicators
+    # # tech indicators
+    # for region_of_interest in REGIONS_OF_INTEREST:
+    #     plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
+
+    # age
     for region_of_interest in REGIONS_OF_INTEREST:
-        plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
+        plot_indicators_for_region('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
+
+    # food_water
+    for region_of_interest in REGIONS_OF_INTEREST:
+        plot_indicators_for_region('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
