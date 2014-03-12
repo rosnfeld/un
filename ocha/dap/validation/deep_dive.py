@@ -33,12 +33,13 @@ INDICATORS_TO_EXCLUDE = {
     'PVL010',  # insufficient history
     'PVX010',  # insufficient history
     'PVX020',  # insufficient history
+    '_Fixed-telephone subscriptions per 100 inhabitants',  # duplicate of another indicator
+    '_Internet users per 100 inhabitants',  # duplicate of another indicator
+    '_Mobile-cellular subscriptions per 100 inhabitants',  # duplicate of another indicator
+    '_Population, total',  # duplicate of another indicator
 }
 
 TECH_INDICATORS = {
-    '_Fixed-telephone subscriptions per 100 inhabitants',
-    '_Internet users per 100 inhabitants',
-    '_Mobile-cellular subscriptions per 100 inhabitants',
     'PCX090',
     'PCX100',
     'PCX110',
@@ -148,9 +149,13 @@ def plot_indicators_for_region(base_path, region, indicators):
 
 
 if __name__ == '__main__':
-    # all indicators
-    ind = scraperwiki.get_indicator_frame()
-    indicators = set(ind.index) - INDICATORS_TO_EXCLUDE
-    for region_of_interest in REGIONS_OF_INTEREST:
-        plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
+    # # all indicators
+    # ind = scraperwiki.get_indicator_frame()
+    # indicators = set(ind.index) - INDICATORS_TO_EXCLUDE
+    # for region_of_interest in REGIONS_OF_INTEREST:
+    #     plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
+    #
 
+    # tech indicators
+    for region_of_interest in REGIONS_OF_INTEREST:
+        plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
