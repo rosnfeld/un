@@ -23,6 +23,17 @@ NEIGHBORS = {
 
 ANALYSIS_START_DATE = datetime.date(1990, 1, 1)
 
+INDICATORS_TO_EXCLUDE = [
+    '_Access to electricity (% of population)',  # insufficient history
+    '_Land area (sq. km)',  # not really interesting for these countries
+    'PCH090',  # insufficient history
+    'PCH090',  # insufficient history
+    'PCX130',  # insufficient history
+    'PSE220',  # insufficient history
+    'PVL010',  # insufficient history
+    'PVX010',  # insufficient history
+    'PVX020',  # insufficient history
+]
 
 def build_analysis_matrix(region):
     joined = scraperwiki.get_joined_frame()
@@ -107,6 +118,10 @@ if __name__ == '__main__':
         for i, row in dataframe[['indID', 'dsID']].drop_duplicates().iterrows():
             ind_id = row['indID']
             ds_id = row['dsID']
+
+            if ind_id in INDICATORS_TO_EXCLUDE:
+                continue
+
             figure = plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, neighbors)
 
             if not figure:
