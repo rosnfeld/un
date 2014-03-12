@@ -61,8 +61,11 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
     ind_name = ind.name[ind_id]
     ind_units = ind.units[ind_id]
 
+    ds = scraperwiki.get_dataset_frame()
+    ds_name = ds.name[ds_id]
+
     # indicator names can be very long, so wrap them if necessary
-    title = ind_id + "\n" + textwrap.fill(ind_name, width=80)
+    title = ind_id + "\n" + textwrap.fill(ind_name, width=80) + "\n" + ds_name
 
     fig = plt.figure()
     ax = fig.gca()
