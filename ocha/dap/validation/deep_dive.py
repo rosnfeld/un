@@ -15,10 +15,11 @@ import datetime
 import textwrap
 import matplotlib_utils
 
-REGIONS_OF_INTEREST = ['COL', 'KEN']
+REGIONS_OF_INTEREST = ['COL', 'KEN', 'YEM']
 NEIGHBORS = {
     'COL': ['BRA', 'ECU', 'PAN', 'PER', 'VEN'],
-    'KEN': ['ETH', 'SDN', 'SOM', 'SSD', 'TZA', 'UGA']
+    'KEN': ['ETH', 'SDN', 'SOM', 'SSD', 'TZA', 'UGA'],
+    'YEM': ['OMN', 'SAU']
 }
 
 ANALYSIS_START_DATE = datetime.date(1990, 1, 1)
@@ -128,7 +129,8 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
 
     if comparison_regions:
         other_regions_pivot = pivoted[pivoted.columns - [region]]
-        other_regions_pivot.plot(ax=ax, alpha=0.6)
+        if not other_regions_pivot.empty:
+            other_regions_pivot.plot(ax=ax, alpha=0.6)
 
     plt.title(title, fontsize=11)
 
@@ -169,21 +171,21 @@ def plot_indicators_for_region(base_path, region, indicators):
 
 
 if __name__ == '__main__':
-    # # all indicators
-    # ind = scraperwiki.get_indicator_frame()
-    # indicators = set(ind.index) - INDICATORS_TO_EXCLUDE
-    # for region_of_interest in REGIONS_OF_INTEREST:
-    #     plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
-    #
+    # all indicators
+    ind = scraperwiki.get_indicator_frame()
+    indicators = set(ind.index) - INDICATORS_TO_EXCLUDE
+    for region_of_interest in REGIONS_OF_INTEREST:
+        plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
+
 
     # # tech indicators
     # for region_of_interest in REGIONS_OF_INTEREST:
     #     plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
 
     # age
-    for region_of_interest in REGIONS_OF_INTEREST:
-        plot_indicators_for_region('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
+    # for region_of_interest in REGIONS_OF_INTEREST:
+    #     plot_indicators_for_region('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
 
     # food_water
-    for region_of_interest in REGIONS_OF_INTEREST:
-        plot_indicators_for_region('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
+    # for region_of_interest in REGIONS_OF_INTEREST:
+    #     plot_indicators_for_region('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
