@@ -21,12 +21,13 @@ NEIGHBORS = {
     'KEN': ['ETH', 'SDN', 'SOM', 'SSD', 'TZA', 'UGA'],
     'YEM': ['OMN', 'SAU']
 }
+REFERENCE_REGIONS = ['SWE', 'AFG']
 
 ANALYSIS_START_DATE = datetime.date(1990, 1, 1)
 
 INDICATORS_TO_EXCLUDE = {
+    '_Land area (sq. km)',  # not really interesting for this analysis
     '_Access to electricity (% of population)',  # insufficient history
-    '_Land area (sq. km)',  # not really interesting for these countries
     'PCH090',  # insufficient history
     'PCH090',  # insufficient history
     'PCX130',  # insufficient history
@@ -67,11 +68,11 @@ FOOD_WATER_INDICATORS = {
 }
 
 
-def build_analysis_matrix(region):
+def build_analysis_matrix(region, comparison_regions):
     joined = scraperwiki.get_joined_frame()
     numeric = scraperwiki.get_numeric_version(joined)
 
-    regions = [region] + NEIGHBORS[region]
+    regions = [region] + comparison_regions
     filtered = numeric[numeric.region.apply(lambda x: x in regions)]
 
     scraperwiki.add_standardized_period(filtered)
@@ -144,10 +145,11 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
 
 def plot_indicators_for_region(base_path, region, indicators):
     """
-    Save off indicator series plots for numeric indicators for region and its neighbors
+    Save off indicator series plots for numeric indicators for region and reference regions
     """
-    dataframe = build_analysis_matrix(region)
-    neighbors = NEIGHBORS[region]
+    # comparison_regions = NEIGHBORS[region]
+    comparison_regions = REFERENCE_REGIONS
+    dataframe = build_analysis_matrix(region, comparison_regions)
     dir_path = os.path.join(base_path, region)
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
@@ -158,7 +160,7 @@ def plot_indicators_for_region(base_path, region, indicators):
         if ind_id not in indicators:
             continue
 
-        figure = plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, neighbors)
+        figure = plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, comparison_regions)
 
         if not figure:
             continue
