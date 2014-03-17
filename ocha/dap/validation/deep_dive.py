@@ -119,7 +119,7 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
     fig = plt.figure()
     ax = fig.gca()
 
-    ax.set_color_cycle(matplotlib_utils.COLOR_PALETTE_RGBA)
+    ax.set_color_cycle(matplotlib_utils.REFERENCE_PALETTE_RGB)
 
     pivoted = numeric.pivot('period_end', 'region', 'value')
     pivoted.index = pd.to_datetime(pivoted.index)
@@ -131,7 +131,7 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
     if comparison_regions:
         other_regions_pivot = pivoted[pivoted.columns - [region]]
         if not other_regions_pivot.empty:
-            other_regions_pivot.plot(ax=ax, alpha=0.6)
+            other_regions_pivot.plot(ax=ax, alpha=0.8)
 
     plt.title(title, fontsize=11)
 

@@ -3,7 +3,7 @@ Various utilities for working with matplotlib
 """
 
 # recommended palette in "Show Me The Numbers" for plot lines
-COLOR_PALETTE_RGBA =\
+SMTN_PALETTE_RGB =\
     [
         (0.30078125, 0.30078125, 0.30078125),  # medium-dark gray
         (0.6953125, 0.4609375, 0.6953125),     # medium purple
@@ -14,6 +14,15 @@ COLOR_PALETTE_RGBA =\
         (0.94140625, 0.484375, 0.6875),        # pink
         (0.94140625, 0.34375, 0.328125),       # medium red
     ]
+
+# trying to not use any colors with associated qualities, e.g. "red = bad", "green = good"
+REFERENCE_PALETTE_RGB =\
+    [
+        (0.2, 0.2, 0.7),  # dark blue
+        (0.7, 0.2, 0.7),  # purple
+        (0.2, 0.7, 0.7),  # cyan
+    ]
+
 
 DARK_GRAY = '#282828'
 
