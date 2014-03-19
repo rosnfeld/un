@@ -24,6 +24,7 @@ NEIGHBORS = {
 REFERENCE_REGIONS = ['SWE', 'AFG']
 
 ANALYSIS_START_DATE = datetime.date(1990, 1, 1)
+ANALYSIS_END_DATE = datetime.date(2012, 12, 31)
 
 INDICATORS_TO_EXCLUDE = {
     '_Land area (sq. km)',  # not really interesting for this analysis
@@ -134,9 +135,11 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
             other_regions_pivot.plot(ax=ax, alpha=0.8)
 
     plt.title(title, fontsize=11)
-
+    plt.xlabel('')
     if isinstance(ind_units, basestring):
         plt.ylabel(ind_units)
+
+    plt.xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
 
     matplotlib_utils.prettyplotlib_style(fig)
 
