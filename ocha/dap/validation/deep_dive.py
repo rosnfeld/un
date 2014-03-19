@@ -140,6 +140,9 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
         plt.ylabel(ind_units)
 
     plt.xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
+    # for some reason this doesn't work nicely
+    # plt.xticks(list(pd.date_range(ANALYSIS_START_DATE, ANALYSIS_END_DATE, freq='a')))
+    fig.autofmt_xdate(rotation=0, ha='center', bottom=0.1)
 
     matplotlib_utils.prettyplotlib_style(fig)
 
