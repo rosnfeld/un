@@ -177,6 +177,45 @@ def plot_indicators_for_region(base_path, region, indicators):
         plt.close(figure)
 
 
+def plot_3_indicators_for_region(base_path, region, indicators):
+    """
+    Write 3 indicators to a single plot, with aligned x-axis
+    """
+    comparison_regions = REFERENCE_REGIONS
+    dataframe = build_analysis_matrix(region, comparison_regions)
+    dir_path = os.path.join(base_path, region)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    ds_ind_pairs = []
+
+    for i, row in dataframe[['indID', 'dsID']].drop_duplicates().iterrows():
+        ind_id = row['indID']
+        ds_id = row['dsID']
+
+        if ind_id not in indicators:
+            continue
+
+        ds_ind_pairs.append((ds_id, ind_id))
+
+    assert len(ds_ind_pairs) == 3
+
+    figure = plt.figure()
+
+    for i, (ds_id, ind_id) in enumerate(ds_ind_pairs):
+        axes = plt.subplot(3, 1, i + 1)
+        plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region, comparison_regions)
+        axes.set_title(axes.get_title().replace('\n', ' / '))
+
+    plt.tight_layout()
+
+    filename = 'triple_plot.png'
+    file_path = os.path.join(dir_path, filename)
+    print 'Writing', file_path
+    figure.savefig(file_path)
+    plt.close(figure)
+
+
 if __name__ == '__main__':
     # all indicators
     ind = scraperwiki.get_indicator_frame()
@@ -187,7 +226,8 @@ if __name__ == '__main__':
 
     # # tech indicators
     for region_of_interest in REGIONS_OF_INTEREST:
-        plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
+        # plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
+        plot_3_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
 
     # age
     # for region_of_interest in REGIONS_OF_INTEREST:
