@@ -278,7 +278,9 @@ if __name__ == '__main__':
     # for region_of_interest in REGIONS_OF_INTEREST:
     #     plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
 
-    # # tech indicators
+    mpl.rc('font', size=8)
+
+    # tech indicators
     for region_of_interest in REGIONS_OF_INTEREST:
     #     plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
         plot_indicators_for_region_combined('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
@@ -286,9 +288,11 @@ if __name__ == '__main__':
     # custom_plot_tech_indicators('/tmp/deep_dive/tech/')
 
     # age
-    # for region_of_interest in REGIONS_OF_INTEREST:
-    #     plot_indicators_for_region('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
+    for region_of_interest in REGIONS_OF_INTEREST:
+        # plot_indicators_for_region('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
+        plot_indicators_for_region_combined('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
 
     # food_water
-    # for region_of_interest in REGIONS_OF_INTEREST:
-    #     plot_indicators_for_region('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
+    for region_of_interest in REGIONS_OF_INTEREST:
+        # plot_indicators_for_region('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
+        plot_indicators_for_region_combined('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)

@@ -1,6 +1,7 @@
 """
 Various utilities for working with matplotlib
 """
+import matplotlib as mpl
 
 # recommended palette in "Show Me The Numbers" for plot lines
 SMTN_PALETTE_RGB =\
@@ -53,6 +54,6 @@ def prettyplotlib_style(axes):
     axes.title.set_color(DARK_GRAY)
 
     # fix up the legend
-    legend = axes.legend(loc='best', frameon=False, fontsize=11)
+    legend = axes.legend(loc='best', frameon=False, fontsize=(mpl.rcParams['font.size'] - 1))
     for text in legend.texts:
         text.set_color(DARK_GRAY)
