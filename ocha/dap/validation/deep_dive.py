@@ -174,9 +174,9 @@ def plot_indicators_for_region(base_path, region, indicators):
         plt.close(figure)
 
 
-def plot_3_indicators_for_region(base_path, region, indicators):
+def plot_indicators_for_region_combined(base_path, region, indicators):
     """
-    Write 3 indicators to a single plot, with aligned x-axis
+    Write multiple indicators to a single plot, with aligned x-axis
     """
     comparison_regions = REFERENCE_REGIONS
     dataframe = build_analysis_matrix(region, comparison_regions)
@@ -195,18 +195,18 @@ def plot_3_indicators_for_region(base_path, region, indicators):
 
         ds_ind_pairs.append((ds_id, ind_id))
 
-    assert len(ds_ind_pairs) == 3
+    pairs_length = len(ds_ind_pairs)
 
     figure = plt.figure()
 
     for i, (ds_id, ind_id) in enumerate(ds_ind_pairs):
-        axes = plt.subplot(3, 1, i + 1)
+        axes = plt.subplot(pairs_length, 1, i + 1)
         plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region, comparison_regions)
         axes.set_title(axes.get_title().replace('\n', ' / '))
 
     plt.tight_layout()
 
-    filename = 'triple_plot.png'
+    filename = 'combined.png'
     file_path = os.path.join(dir_path, filename)
     print 'Writing', file_path
     figure.savefig(file_path)
@@ -279,11 +279,11 @@ if __name__ == '__main__':
     #     plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
 
     # # tech indicators
-    # for region_of_interest in REGIONS_OF_INTEREST:
+    for region_of_interest in REGIONS_OF_INTEREST:
     #     plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
-    #     plot_3_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
+        plot_indicators_for_region_combined('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
 
-    custom_plot_tech_indicators('/tmp/deep_dive/tech/')
+    # custom_plot_tech_indicators('/tmp/deep_dive/tech/')
 
     # age
     # for region_of_interest in REGIONS_OF_INTEREST:
