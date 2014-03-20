@@ -82,7 +82,7 @@ def build_analysis_matrix(region, comparison_regions):
     return filtered
 
 
-def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, comparison_regions):
+def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region, comparison_regions):
     """
     Generates a simple matplotlib plot of the value timeseries for the given indicator/dataset/region
     """
@@ -90,7 +90,7 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
 
     if raw_rows.empty:
         print 'No data for %s/%s/%s' % (ind_id, ds_id, region)
-        return None
+        return False
 
     if comparison_regions:
         regions = [region] + comparison_regions
@@ -117,36 +117,33 @@ def plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, compa
 
     title = ind_id + '\n' + ind_name_wrapped + ds_join + ds_name
 
-    fig = plt.figure()
-    ax = fig.gca()
-
-    ax.set_color_cycle(matplotlib_utils.REFERENCE_PALETTE_RGB)
+    axes.set_color_cycle(matplotlib_utils.REFERENCE_PALETTE_RGB)
 
     pivoted = numeric.pivot('period_end', 'region', 'value')
     pivoted.index = pd.to_datetime(pivoted.index)
     # this is a little gross as creates the impression of us having more data than we actually do
     pivoted = pivoted.interpolate(method='time')
 
-    pivoted[region].plot(ax=ax, label=region)
+    pivoted[region].plot(ax=axes, label=region)
 
     if comparison_regions:
         other_regions_pivot = pivoted[pivoted.columns - [region]]
         if not other_regions_pivot.empty:
-            other_regions_pivot.plot(ax=ax, alpha=0.8)
+            other_regions_pivot.plot(ax=axes, alpha=0.8)
 
-    plt.title(title, fontsize=11)
-    plt.xlabel('')
+    axes.set_title(title, fontsize=11)
+    axes.set_xlabel('')
     if isinstance(ind_units, basestring):
-        plt.ylabel(ind_units)
+        axes.set_ylabel(ind_units)
 
-    plt.xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
+    axes.set_xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
     # for some reason this doesn't work nicely
     # plt.xticks(list(pd.date_range(ANALYSIS_START_DATE, ANALYSIS_END_DATE, freq='a')))
-    fig.autofmt_xdate(rotation=0, ha='center', bottom=0.1)
+    plt.gcf().autofmt_xdate(rotation=0, ha='center', bottom=0.1)
 
-    matplotlib_utils.prettyplotlib_style(fig)
+    matplotlib_utils.prettyplotlib_style(axes)
 
-    return fig
+    return True
 
 
 def plot_indicators_for_region(base_path, region, indicators):
@@ -166,9 +163,11 @@ def plot_indicators_for_region(base_path, region, indicators):
         if ind_id not in indicators:
             continue
 
-        figure = plot_indicator_timeseries_for_region(dataframe, ind_id, ds_id, region, comparison_regions)
+        figure = plt.figure()
+        axes = plt.gca()
+        success = plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region, comparison_regions)
 
-        if not figure:
+        if not success:
             continue
 
         filename = ind_id.replace('/', '_') + '_' + ds_id + '.png'
@@ -182,13 +181,13 @@ if __name__ == '__main__':
     # all indicators
     ind = scraperwiki.get_indicator_frame()
     indicators = set(ind.index) - INDICATORS_TO_EXCLUDE
-    for region_of_interest in REGIONS_OF_INTEREST:
-        plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
+    # for region_of_interest in REGIONS_OF_INTEREST:
+    #     plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
 
 
     # # tech indicators
-    # for region_of_interest in REGIONS_OF_INTEREST:
-    #     plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
+    for region_of_interest in REGIONS_OF_INTEREST:
+        plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
 
     # age
     # for region_of_interest in REGIONS_OF_INTEREST:
