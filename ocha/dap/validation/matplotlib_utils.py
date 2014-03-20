@@ -53,7 +53,6 @@ def prettyplotlib_style(axes):
     axes.title.set_color(DARK_GRAY)
 
     # fix up the legend
-    legend = axes.legend(loc='best', frameon=False)
+    legend = axes.legend(loc='best', frameon=False, fontsize=11)
     for text in legend.texts:
-        text.set_fontsize(11)
         text.set_color(DARK_GRAY)

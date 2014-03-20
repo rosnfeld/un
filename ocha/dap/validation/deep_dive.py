@@ -10,6 +10,7 @@ Things to do:
 import scraperwiki
 import os
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import pandas as pd
 import datetime
 import textwrap
@@ -98,10 +99,6 @@ def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region,
         raw_rows = dataframe[(dataframe.indID == ind_id) & (dataframe.dsID == ds_id) &
                              dataframe.region.apply(region_filter)]
 
-    # assume these transformations have not yet been done, should be cheap on a single indicator/region
-    numeric = scraperwiki.get_numeric_version(raw_rows)
-    scraperwiki.add_standardized_period(numeric)
-
     ind = scraperwiki.get_indicator_frame()
     ind_name = ind.name[ind_id]
     ind_units = ind.units[ind_id]
@@ -119,7 +116,7 @@ def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region,
 
     axes.set_color_cycle(matplotlib_utils.REFERENCE_PALETTE_RGB)
 
-    pivoted = numeric.pivot('period_end', 'region', 'value')
+    pivoted = raw_rows.pivot('period_end', 'region', 'value')
     pivoted.index = pd.to_datetime(pivoted.index)
     # this is a little gross as creates the impression of us having more data than we actually do
     pivoted = pivoted.interpolate(method='time')
@@ -216,6 +213,64 @@ def plot_3_indicators_for_region(base_path, region, indicators):
     plt.close(figure)
 
 
+def custom_plot_tech_indicators(base_path):
+    """
+    Write tech indicators to a single plot, with aligned x-axis
+    """
+    regions = REGIONS_OF_INTEREST + REFERENCE_REGIONS
+    dataframe = build_analysis_matrix([], regions)
+    dir_path = os.path.join(base_path, 'cross_region')
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    ds_ind_pairs = [('World Bank', 'PCX090'), ('World Bank', 'PCX110'), ('World Bank', 'PCX100')]
+    ind = scraperwiki.get_indicator_frame()
+
+    figure = plt.figure()
+    mpl.rc('font', size=11)
+
+    for i, (ds_id, ind_id) in enumerate(ds_ind_pairs):
+        axes = plt.subplot(3, 1, i + 1)
+
+        ind_name = ind.name[ind_id]
+        ind_units = ind.units[ind_id]
+
+        ind_rows = dataframe[(dataframe.indID == ind_id) & (dataframe.dsID == ds_id)]
+
+        ds = scraperwiki.get_dataset_frame()
+        ds_name = ds.name[ds_id]
+
+        title = ind_id + ' / ' + ind_name + ' / ' + ds_name
+
+        # axes.set_color_cycle(matplotlib_utils.REFERENCE_PALETTE_RGB)
+
+        pivoted = ind_rows.pivot('period_end', 'region', 'value')
+        pivoted.index = pd.to_datetime(pivoted.index)
+        # this is a little gross as creates the impression of us having more data than we actually do
+        pivoted = pivoted.interpolate(method='time')
+
+        pivoted.plot(ax=axes, alpha=0.8)
+
+        axes.set_title(title)
+        axes.set_xlabel('')
+        if isinstance(ind_units, basestring):
+            axes.set_ylabel(ind_units)
+
+        axes.set_xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
+        matplotlib_utils.prettyplotlib_style(axes)
+
+        axes.legend(loc='best', frameon=False, fontsize=10)
+
+    plt.gcf().autofmt_xdate(rotation=0, ha='center', bottom=0.1)
+    plt.tight_layout()
+
+    filename = 'tech_plot.png'
+    file_path = os.path.join(dir_path, filename)
+    print 'Writing', file_path
+    figure.savefig(file_path)
+    plt.close(figure)
+
+
 if __name__ == '__main__':
     # all indicators
     ind = scraperwiki.get_indicator_frame()
@@ -223,11 +278,12 @@ if __name__ == '__main__':
     # for region_of_interest in REGIONS_OF_INTEREST:
     #     plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
 
-
     # # tech indicators
-    for region_of_interest in REGIONS_OF_INTEREST:
-        # plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
-        plot_3_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
+    # for region_of_interest in REGIONS_OF_INTEREST:
+    #     plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
+    #     plot_3_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
+
+    custom_plot_tech_indicators('/tmp/deep_dive/tech/')
 
     # age
     # for region_of_interest in REGIONS_OF_INTEREST:
