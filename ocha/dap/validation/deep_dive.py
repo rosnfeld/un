@@ -49,16 +49,18 @@ TECH_INDICATORS = {
     'PCX110',
 }
 
-AGE_INDICATORS = {
-    'PSE140',
-    'PSE150',
-    'PSP060',
-    'PSP070',
-    'PVH010',
+MORTALITY_RATIO_INDICATORS = {
     'PVH120',
     'PVH140',
     'PVH180',
     'PVH190',
+}
+
+AGE_INDICATORS = {
+    'PSE140',
+    'PSE150',
+    'PSP070',
+    'PVH010',
 }
 
 FOOD_WATER_INDICATORS = {
@@ -174,7 +176,7 @@ def plot_indicators_for_region(base_path, region, indicators):
         plt.close(figure)
 
 
-def plot_indicators_for_region_combined(base_path, region, indicators):
+def plot_indicators_for_region_combined(base_path, region, indicators, title):
     """
     Write multiple indicators to a single plot, with aligned x-axis
     """
@@ -204,9 +206,13 @@ def plot_indicators_for_region_combined(base_path, region, indicators):
         plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region, comparison_regions)
         axes.set_title(axes.get_title().replace('\n', ' / '))
 
-    plt.tight_layout()
+    title += ' - ' + region
 
-    filename = 'combined.png'
+    plt.suptitle(title, fontsize=(mpl.rcParams['font.size'] + 2))
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.9)
+
+    filename = title + '.png'
     file_path = os.path.join(dir_path, filename)
     print 'Writing', file_path
     figure.savefig(file_path)
@@ -278,21 +284,32 @@ if __name__ == '__main__':
     # for region_of_interest in REGIONS_OF_INTEREST:
     #     plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
 
-    mpl.rc('font', size=8)
-
     # tech indicators
-    for region_of_interest in REGIONS_OF_INTEREST:
+    # for region_of_interest in REGIONS_OF_INTEREST:
     #     plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
-        plot_indicators_for_region_combined('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
 
     # custom_plot_tech_indicators('/tmp/deep_dive/tech/')
 
     # age
-    for region_of_interest in REGIONS_OF_INTEREST:
-        # plot_indicators_for_region('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
-        plot_indicators_for_region_combined('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
+    # for region_of_interest in REGIONS_OF_INTEREST:
+    #     plot_indicators_for_region('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
 
     # food_water
+    # for region_of_interest in REGIONS_OF_INTEREST:
+    #     plot_indicators_for_region('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
+
+    mpl.rc('font', size=8)
     for region_of_interest in REGIONS_OF_INTEREST:
-        # plot_indicators_for_region('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
-        plot_indicators_for_region_combined('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
+        base_path = '/tmp/deep_dive/'
+
+        # this looks pretty good, as is
+        plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
+
+        ind_with_2_sources = {'PVN010'}
+        # TODO would probably be better with both sources on the same axes? i.e. more custom plotting
+        plot_indicators_for_region_combined(base_path, region_of_interest, ind_with_2_sources, 'Cross-Source Comparison')
+
+        plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS - ind_with_2_sources, 'Food and Water')
+
+        plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
+        plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
