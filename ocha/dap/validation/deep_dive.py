@@ -180,6 +180,8 @@ def plot_indicators_for_region_combined(base_path, region, indicators, title):
     """
     Write multiple indicators to a single plot, with aligned x-axis
     """
+    mpl.rc('font', size=8)  # annoying you can't "push"/"pop" context (I guess I could always add that...)
+
     comparison_regions = REFERENCE_REGIONS
     dataframe = build_analysis_matrix(region, comparison_regions)
     dir_path = os.path.join(base_path, region)
@@ -277,6 +279,54 @@ def custom_plot_tech_indicators(base_path):
     plt.close(figure)
 
 
+def custom_plot_PVN010_different_sources(base_path, region):
+    """
+    Write PVN010 from 2 sources to a single plot
+    """
+    dataframe = build_analysis_matrix(region, [])
+    dir_path = os.path.join(base_path, region)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    ind_id = 'PVN010'
+
+    figure = plt.figure()
+    mpl.rc('font', size=11)
+
+    axes = plt.gca()
+
+    raw_rows = dataframe[(dataframe.indID == ind_id) & (dataframe.region == region)]
+
+    ind = scraperwiki.get_indicator_frame()
+    ind_name = ind.name[ind_id]
+    ind_units = ind.units[ind_id]
+
+    title = ind_id + ' / ' + ind_name + '\n' + 'Compared Across Data Sources'
+
+    pivoted = raw_rows.pivot('period_end', 'ds_name', 'value')
+    pivoted.index = pd.to_datetime(pivoted.index)
+    # this is a little gross as creates the impression of us having more data than we actually do
+    pivoted = pivoted.interpolate(method='time')
+
+    pivoted.plot(ax=axes)
+
+    axes.set_title(title, fontsize=11)
+    axes.set_xlabel('')
+    if isinstance(ind_units, basestring):
+        axes.set_ylabel(ind_units)
+
+    axes.set_xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
+    plt.gcf().autofmt_xdate(rotation=0, ha='center', bottom=0.1)
+
+    matplotlib_utils.prettyplotlib_style(axes)
+
+    filename = 'PVN010_different_sources.png'
+    file_path = os.path.join(dir_path, filename)
+    print 'Writing', file_path
+    figure.savefig(file_path)
+    plt.close(figure)
+
+
 if __name__ == '__main__':
     # all indicators
     ind = scraperwiki.get_indicator_frame()
@@ -298,7 +348,6 @@ if __name__ == '__main__':
     # for region_of_interest in REGIONS_OF_INTEREST:
     #     plot_indicators_for_region('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
 
-    mpl.rc('font', size=8)
     for region_of_interest in REGIONS_OF_INTEREST:
         base_path = '/tmp/deep_dive/'
 
@@ -306,8 +355,8 @@ if __name__ == '__main__':
         plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
 
         ind_with_2_sources = {'PVN010'}
-        # TODO would probably be better with both sources on the same axes? i.e. more custom plotting
-        plot_indicators_for_region_combined(base_path, region_of_interest, ind_with_2_sources, 'Cross-Source Comparison')
+        # plot_indicators_for_region_combined(base_path, region_of_interest, ind_with_2_sources, 'Cross-Source Comparison')
+        custom_plot_PVN010_different_sources(base_path, region_of_interest)
 
         plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS - ind_with_2_sources, 'Food and Water')
 
