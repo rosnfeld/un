@@ -180,6 +180,7 @@ def plot_indicators_for_region_combined(base_path, region, indicators, title):
     """
     Write multiple indicators to a single plot, with aligned x-axis
     """
+    mpl.rcdefaults()  # reset matplotlib settings
     mpl.rc('font', size=8)  # annoying you can't "push"/"pop" context (I guess I could always add that...)
 
     comparison_regions = REFERENCE_REGIONS
@@ -235,6 +236,7 @@ def custom_plot_tech_indicators(base_path):
     ind = scraperwiki.get_indicator_frame()
 
     figure = plt.figure()
+    mpl.rcdefaults()  # reset matplotlib settings
     mpl.rc('font', size=11)
 
     for i, (ds_id, ind_id) in enumerate(ds_ind_pairs):
@@ -291,6 +293,7 @@ def custom_plot_PVN010_different_sources(base_path, region):
     ind_id = 'PVN010'
 
     figure = plt.figure()
+    mpl.rcdefaults()  # reset matplotlib settings
     mpl.rc('font', size=11)
 
     axes = plt.gca()
