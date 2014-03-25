@@ -64,8 +64,8 @@ AGE_INDICATORS = {
 }
 
 FOOD_WATER_INDICATORS = {
-    'PVN010',  # will pull in 2 sources
-    'PVN050',
+    # 'PVN010',  # will pull in 2 sources, handled separately
+    # 'PVN050',  # spotty data
     'PVW010',
     '_Population undernourished, percentage',
     'PVF020',
@@ -357,11 +357,10 @@ if __name__ == '__main__':
         # this looks pretty good, as is
         plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
 
-        ind_with_2_sources = {'PVN010'}
         # plot_indicators_for_region_combined(base_path, region_of_interest, ind_with_2_sources, 'Cross-Source Comparison')
         custom_plot_PVN010_different_sources(base_path, region_of_interest)
 
-        plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS - ind_with_2_sources, 'Food and Water')
+        plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
 
         plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
         plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
