@@ -329,7 +329,7 @@ def custom_plot_PVN010_different_sources(base_path, region):
 
     matplotlib_utils.prettyplotlib_style(axes)
 
-    filename = 'PVN010_different_sources.png'
+    filename = 'PVN010_different_sources - ' + region + '.png'
     file_path = os.path.join(dir_path, filename)
     print 'Writing', file_path
     figure.savefig(file_path)
