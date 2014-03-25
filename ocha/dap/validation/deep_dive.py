@@ -47,12 +47,12 @@ TECH_INDICATORS = {
     'PCX110',
 }
 
-MORTALITY_RATIO_INDICATORS = {
+MORTALITY_RATIO_INDICATORS = [
     'PVH120',
-    'PVH140',
+    # 'PVH140',  # seems to be obsolete
     'PVH180',
-    'PVH190',
-}
+    # 'PVH190',  # seems to be obsolete
+]
 
 AGE_INDICATORS = {
     'PSE140',
