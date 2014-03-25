@@ -3,9 +3,7 @@ An "deep dive" of exploratory data analysis (EDA) on a few countries in the Scra
 
 This doesn't particularly belong in "validation" but it's related to scraperwiki.py.
 
-Things to do:
-- look at cross-section of indicators for a given region, do indicators from different sources "line up"/relate?
-
+Unfortunately a bit of a messy scratch-pad more than anything.
 """
 import scraperwiki
 import os
@@ -71,6 +69,13 @@ FOOD_WATER_INDICATORS = {
     'PVF020',
 }
 
+REGION_COLOR = (0.2, 0.2, 0.7, 1.0)  # dark blue
+
+REFERENCE_REGION_COLORMAP = {
+    'AFG': (0.7, 0.2, 0.7, 0.8),  # purple
+    'SWE': (0.2, 0.7, 0.7, 0.8),  # cyan
+}
+
 
 def build_analysis_matrix(region, comparison_regions):
     joined = scraperwiki.get_joined_frame()
@@ -123,12 +128,13 @@ def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region,
     # this is a little gross as creates the impression of us having more data than we actually do
     pivoted = pivoted.interpolate(method='time')
 
-    pivoted[region].plot(ax=axes, label=region)
+    pivoted[region].plot(ax=axes, label=region, color=REGION_COLOR)
 
     if comparison_regions:
         other_regions_pivot = pivoted[pivoted.columns - [region]]
         if not other_regions_pivot.empty:
-            other_regions_pivot.plot(ax=axes, alpha=0.8)
+            for other_region in other_regions_pivot.columns:
+                pivoted[other_region].plot(ax=axes, color=REFERENCE_REGION_COLORMAP[other_region])
 
     axes.set_title(title, fontsize=11)
     axes.set_xlabel('')
