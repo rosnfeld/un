@@ -310,7 +310,7 @@ def custom_plot_PVN010_different_sources(base_path, region):
     ind_name = ind.name[ind_id]
     ind_units = ind.units[ind_id]
 
-    title = ind_id + ' / ' + ind_name + '\n' + 'Compared Across Data Sources'
+    title = ind_id + ' / ' + ind_name + ' - ' + region + '\n' + 'Compared Across Data Sources'
 
     pivoted = raw_rows.pivot('period_end', 'ds_name', 'value')
     pivoted.index = pd.to_datetime(pivoted.index)
