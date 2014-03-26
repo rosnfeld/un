@@ -358,8 +358,12 @@ def fts_funding_over_time(base_path, region):
     matplotlib_utils.prettyplotlib_style(axes)
     axes.legend().set_visible(False)
 
-    axes.yaxis.set_major_formatter(mpl.ticker.FuncFormatter('{:,.0f}'.format))
-    axes.set_ylabel('USD')
+    def format_currency_millions(value, position):
+        millions = value/1e6
+        return '{:,.0f}'.format(millions)
+
+    axes.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_currency_millions))
+    axes.set_ylabel('USD Millions')
 
     title = "Funding as recorded by FTS - " + region
     axes.set_title(title, fontsize=11)
