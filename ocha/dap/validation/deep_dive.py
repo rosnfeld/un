@@ -336,6 +336,43 @@ def custom_plot_PVN010_different_sources(base_path, region):
     plt.close(figure)
 
 
+def fts_funding_over_time(base_path, region):
+    dir_path = os.path.join(base_path, region)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    contributions_path = '/tmp/fts/per_country/{region}/fts_{region}_contributions.csv'.format(region=region)
+    contributions = pd.read_csv(contributions_path, parse_dates=['year'])
+    # remove contributions that never made it past Pledge status, as they are generally filtered out of FTS reports
+    contributions = contributions[contributions.status != 'Pledge']
+
+    figure = plt.figure()
+    mpl.rcdefaults()  # reset matplotlib settings
+    mpl.rc('font', size=11)
+
+    axes = plt.gca()
+
+    contributions.groupby('year').amount.sum().plot(ax=axes)
+    axes.set_xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
+
+    matplotlib_utils.prettyplotlib_style(axes)
+    axes.legend().set_visible(False)
+
+    axes.yaxis.set_major_formatter(mpl.ticker.FuncFormatter('{:,.0f}'.format))
+    axes.set_ylabel('USD')
+
+    title = "Funding as recorded by FTS - " + region
+    axes.set_title(title, fontsize=11)
+
+    plt.tight_layout()
+
+    filename = 'FTS_funding - ' + region + '.png'
+    file_path = os.path.join(dir_path, filename)
+    print 'Writing', file_path
+    figure.savefig(file_path)
+    plt.close(figure)
+
+
 if __name__ == '__main__':
     # all indicators
     ind = scraperwiki.get_indicator_frame()
@@ -360,13 +397,15 @@ if __name__ == '__main__':
     for region_of_interest in REGIONS_OF_INTEREST:
         base_path = '/tmp/deep_dive/'
 
-        # this looks pretty good, as is
-        plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
+    #     # this looks pretty good, as is
+    #     plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
+    #
+    #     # plot_indicators_for_region_combined(base_path, region_of_interest, ind_with_2_sources, 'Cross-Source Comparison')
+    #     custom_plot_PVN010_different_sources(base_path, region_of_interest)
+    #
+    #     plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
+    #
+    #     plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
+    #     plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
 
-        # plot_indicators_for_region_combined(base_path, region_of_interest, ind_with_2_sources, 'Cross-Source Comparison')
-        custom_plot_PVN010_different_sources(base_path, region_of_interest)
-
-        plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
-
-        plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
-        plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
+        fts_funding_over_time(base_path, region_of_interest)
