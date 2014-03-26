@@ -358,6 +358,8 @@ def fts_funding_over_time(base_path, region):
     matplotlib_utils.prettyplotlib_style(axes)
     axes.legend().set_visible(False)
 
+    axes.set_xlabel('')  # for consistency with other plots
+
     def format_currency_millions(value, position):
         millions = value/1e6
         return '{:,.0f}'.format(millions)
