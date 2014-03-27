@@ -90,6 +90,13 @@ def build_analysis_matrix(region, comparison_regions):
     return filtered
 
 
+def write_figure_to_file(figure, dir_path, filename):
+    file_path = os.path.join(dir_path, filename)
+    print 'Writing', file_path
+    figure.savefig(file_path)
+    plt.close(figure)
+
+
 def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region, comparison_regions):
     """
     Generates a simple matplotlib plot of the value timeseries for the given indicator/dataset/region
@@ -177,10 +184,7 @@ def plot_indicators_for_region(base_path, region, indicators):
             continue
 
         filename = ind_id.replace('/', '_') + '_' + ds_id + '.png'
-        file_path = os.path.join(dir_path, filename)
-        print 'Writing', file_path
-        figure.savefig(file_path)
-        plt.close(figure)
+        write_figure_to_file(figure, dir_path, filename)
 
 
 def plot_indicators_for_region_combined(base_path, region, indicators, title):
@@ -225,10 +229,7 @@ def plot_indicators_for_region_combined(base_path, region, indicators, title):
     plt.subplots_adjust(top=0.9, bottom=0.09)
 
     filename = title + '.png'
-    file_path = os.path.join(dir_path, filename)
-    print 'Writing', file_path
-    figure.savefig(file_path)
-    plt.close(figure)
+    write_figure_to_file(figure, dir_path, filename)
 
 
 def custom_plot_tech_indicators(base_path):
@@ -284,10 +285,7 @@ def custom_plot_tech_indicators(base_path):
     plt.tight_layout()
 
     filename = 'tech_plot.png'
-    file_path = os.path.join(dir_path, filename)
-    print 'Writing', file_path
-    figure.savefig(file_path)
-    plt.close(figure)
+    write_figure_to_file(figure, dir_path, filename)
 
 
 def custom_plot_PVN010_different_sources(base_path, region):
@@ -333,10 +331,7 @@ def custom_plot_PVN010_different_sources(base_path, region):
     matplotlib_utils.prettyplotlib_style(axes, include_legend=True)
 
     filename = 'PVN010_different_sources - ' + region + '.png'
-    file_path = os.path.join(dir_path, filename)
-    print 'Writing', file_path
-    figure.savefig(file_path)
-    plt.close(figure)
+    write_figure_to_file(figure, dir_path, filename)
 
 
 def plot_fts_funding_over_time(base_path, region):
@@ -375,10 +370,7 @@ def plot_fts_funding_over_time(base_path, region):
     plt.tight_layout()
 
     filename = 'FTS_funding - ' + region + '.png'
-    file_path = os.path.join(dir_path, filename)
-    print 'Writing', file_path
-    figure.savefig(file_path)
-    plt.close(figure)
+    write_figure_to_file(figure, dir_path, filename)
 
 
 if __name__ == '__main__':
