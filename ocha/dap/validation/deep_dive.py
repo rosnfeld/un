@@ -146,11 +146,8 @@ def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region,
     # plt.xticks(list(pd.date_range(ANALYSIS_START_DATE, ANALYSIS_END_DATE, freq='a')))
     plt.gcf().autofmt_xdate(rotation=0, ha='center', bottom=0.1)
 
-    # matplotlib_utils.prettyplotlib_style(axes)
-    matplotlib_utils.wolfram_style(axes)
-
-    handles, labels = axes.get_legend_handles_labels()
-    plt.gcf().legend(handles, labels, 'lower center', frameon=False, ncol=3)
+    matplotlib_utils.prettyplotlib_style(axes)
+    # matplotlib_utils.wolfram_style(axes)
 
     return True
 
@@ -221,9 +218,11 @@ def plot_indicators_for_region_combined(base_path, region, indicators, title):
 
     title += ' - ' + region
 
+    matplotlib_utils.add_figure_legend(figure)
+
     plt.suptitle(title, fontsize=(mpl.rcParams['font.size'] + 2))
     plt.tight_layout()
-    plt.subplots_adjust(top=0.92, bottom=0.08)
+    plt.subplots_adjust(top=0.9, bottom=0.09)
 
     filename = title + '.png'
     file_path = os.path.join(dir_path, filename)
@@ -331,7 +330,7 @@ def custom_plot_PVN010_different_sources(base_path, region):
     axes.set_xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
     plt.gcf().autofmt_xdate(rotation=0, ha='center', bottom=0.1)
 
-    matplotlib_utils.prettyplotlib_style(axes)
+    matplotlib_utils.prettyplotlib_style(axes, include_legend=True)
 
     filename = 'PVN010_different_sources - ' + region + '.png'
     file_path = os.path.join(dir_path, filename)
@@ -360,7 +359,6 @@ def plot_fts_funding_over_time(base_path, region):
     axes.set_xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
 
     matplotlib_utils.prettyplotlib_style(axes)
-    axes.legend().set_visible(False)
 
     axes.set_xlabel('')  # for consistency with other plots
 

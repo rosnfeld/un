@@ -32,7 +32,7 @@ LIGHT_GRAY = '#A0A0A0'
 DESIRED_SPINES = ['bottom', 'left']
 
 
-def prettyplotlib_style(axes):
+def prettyplotlib_style(axes, include_legend=False):
     """
     Make similar output to "prettyplotlib", but do things manually rather than use a library.
     """
@@ -55,10 +55,10 @@ def prettyplotlib_style(axes):
     axes.yaxis.label.set_color(DARK_GRAY)
     axes.title.set_color(DARK_GRAY)
 
-    # fix up the legend
-    legend = axes.legend(loc='best', frameon=False, fontsize=(mpl.rcParams['font.size'] - 1))
-    for text in legend.texts:
-        text.set_color(DARK_GRAY)
+    if include_legend:
+        legend = axes.legend(loc='best', frameon=False, fontsize=(mpl.rcParams['font.size'] - 1))
+        for text in legend.texts:
+            text.set_color(DARK_GRAY)
 
 
 def wolfram_style(axes):
@@ -86,3 +86,20 @@ def wolfram_style(axes):
     # title inside box - unfortunately only works for shorter titles
     axes.title.set_position((0.5, 0.85))
     axes.title.set_color(MEDIUM_GRAY)
+
+
+def add_figure_legend(figure):
+    # find axes with most lines
+    axes_with_most_lines = None
+
+    # probably a "tighter" way to do this in python than is done here
+    for axes in figure.get_axes():
+        if axes_with_most_lines is None:
+            axes_with_most_lines = axes
+            continue
+
+        if len(axes.get_lines()) > len(axes_with_most_lines.get_lines()):
+            axes_with_most_lines = axes
+
+    handles, labels = axes_with_most_lines.get_legend_handles_labels()
+    figure.legend(handles, labels, 'lower center', frameon=False, ncol=len(axes_with_most_lines.get_lines()))
