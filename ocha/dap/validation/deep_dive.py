@@ -409,3 +409,11 @@ if __name__ == '__main__':
         plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
 
         plot_fts_funding_over_time(base_path, region_of_interest)
+
+        # TODO look at FTS funding by cluster
+        # on FTS website, report "D" is funding by cluster, but that's per appeal
+        # a country can have 0-n appeals per year, and there are no current ones for COL
+        # data also doesn't go back very far
+        # ideas:
+        # - stacked bar charts for past 5-6 years (2008 onwards?) for KEN and YEM
+        # - subplots, maybe 2 columns (KEN vs YEM) and 3 rows (year), with horizontal bar charts
