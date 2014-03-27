@@ -146,7 +146,11 @@ def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region,
     # plt.xticks(list(pd.date_range(ANALYSIS_START_DATE, ANALYSIS_END_DATE, freq='a')))
     plt.gcf().autofmt_xdate(rotation=0, ha='center', bottom=0.1)
 
-    matplotlib_utils.prettyplotlib_style(axes)
+    # matplotlib_utils.prettyplotlib_style(axes)
+    matplotlib_utils.wolfram_style(axes)
+
+    handles, labels = axes.get_legend_handles_labels()
+    plt.gcf().legend(handles, labels, 'lower center', frameon=False, ncol=3)
 
     return True
 
@@ -219,7 +223,7 @@ def plot_indicators_for_region_combined(base_path, region, indicators, title):
 
     plt.suptitle(title, fontsize=(mpl.rcParams['font.size'] + 2))
     plt.tight_layout()
-    plt.subplots_adjust(top=0.9)
+    plt.subplots_adjust(top=0.92, bottom=0.08)
 
     filename = title + '.png'
     file_path = os.path.join(dir_path, filename)
@@ -336,7 +340,7 @@ def custom_plot_PVN010_different_sources(base_path, region):
     plt.close(figure)
 
 
-def fts_funding_over_time(base_path, region):
+def plot_fts_funding_over_time(base_path, region):
     dir_path = os.path.join(base_path, region)
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
@@ -403,15 +407,15 @@ if __name__ == '__main__':
     for region_of_interest in REGIONS_OF_INTEREST:
         base_path = '/tmp/deep_dive/'
 
-    #     # this looks pretty good, as is
-    #     plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
-    #
-    #     # plot_indicators_for_region_combined(base_path, region_of_interest, ind_with_2_sources, 'Cross-Source Comparison')
-    #     custom_plot_PVN010_different_sources(base_path, region_of_interest)
-    #
-    #     plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
-    #
-    #     plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
-    #     plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
+        # this looks pretty good, as is
+        plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
 
-        fts_funding_over_time(base_path, region_of_interest)
+        # plot_indicators_for_region_combined(base_path, region_of_interest, ind_with_2_sources, 'Cross-Source Comparison')
+        custom_plot_PVN010_different_sources(base_path, region_of_interest)
+
+        plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
+
+        plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
+        plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
+
+        plot_fts_funding_over_time(base_path, region_of_interest)

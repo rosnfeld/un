@@ -26,6 +26,8 @@ REFERENCE_PALETTE_RGB =\
 
 
 DARK_GRAY = '#282828'
+MEDIUM_GRAY = '#666666'
+LIGHT_GRAY = '#A0A0A0'
 
 DESIRED_SPINES = ['bottom', 'left']
 
@@ -57,3 +59,30 @@ def prettyplotlib_style(axes):
     legend = axes.legend(loc='best', frameon=False, fontsize=(mpl.rcParams['font.size'] - 1))
     for text in legend.texts:
         text.set_color(DARK_GRAY)
+
+
+def wolfram_style(axes):
+    """
+    Style plot similarly to some of the examples on Stephen Wolfram's blog:
+      - light gray bounding box, but dark ticks
+      - legend outside box
+      - title inside box, in medium gray
+    """
+    for spine in axes.spines:
+        axes.spines[spine].set_linewidth(0.5)  # this is really nice
+        axes.spines[spine].set_color(LIGHT_GRAY)
+
+    # only have ticks on bottom and left
+    axes.xaxis.set_ticks_position('bottom')
+    axes.yaxis.set_ticks_position('left')
+
+    # cleaner to not have a grid
+    axes.grid(False)
+
+    # kind of subtle
+    axes.xaxis.label.set_color(DARK_GRAY)
+    axes.yaxis.label.set_color(DARK_GRAY)
+
+    # title inside box - unfortunately only works for shorter titles
+    axes.title.set_position((0.5, 0.85))
+    axes.title.set_color(MEDIUM_GRAY)
