@@ -97,6 +97,11 @@ def write_figure_to_file(figure, dir_path, filename):
     plt.close(figure)
 
 
+def format_currency_millions(value, position):
+    millions = value/1e6
+    return '{:,.0f}'.format(millions)
+
+
 def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region, comparison_regions):
     """
     Generates a simple matplotlib plot of the value timeseries for the given indicator/dataset/region
@@ -357,10 +362,6 @@ def plot_fts_funding_over_time(base_path, region):
 
     axes.set_xlabel('')  # for consistency with other plots
 
-    def format_currency_millions(value, position):
-        millions = value/1e6
-        return '{:,.0f}'.format(millions)
-
     axes.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_currency_millions))
     axes.set_ylabel('USD Millions')
 
@@ -370,6 +371,66 @@ def plot_fts_funding_over_time(base_path, region):
     plt.tight_layout()
 
     filename = 'FTS_funding - ' + region + '.png'
+    write_figure_to_file(figure, dir_path, filename)
+
+
+def get_fts_appeal_ids_for_year(region, year):
+    appeals_path = '/tmp/fts/per_country/{region}/fts_{region}_appeals.csv'.format(region=region)
+    appeals = pd.read_csv(appeals_path, index_col='id')
+    appeals_in_year = appeals[appeals.year == year]
+    return appeals_in_year.index.values
+
+
+def get_cluster_data_from_fts_api(appeal_id):
+    fts_url = 'http://fts.unocha.org/api/v1/Cluster/appeal/{appeal_id}.json'.format(appeal_id=appeal_id)
+    return pd.read_json(fts_url)
+
+
+def plot_fts_cluster_funding(base_path, region, year):
+    """
+    Make a horizontal bar chart of FTS funding by cluster.
+    FTS reports cluster funding by appeal, and a country can have 0-n appeals per year.
+    For now, combine funding across appeals for a given year.
+    """
+    mpl.rcdefaults()  # reset matplotlib settings
+    mpl.rc('font', size=9)  # annoying you can't "push"/"pop" context (I guess I could always add that...)
+
+    dir_path = os.path.join(base_path, region)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    appeal_ids = get_fts_appeal_ids_for_year(region, year)
+
+    # unfortunately, cluster data in projects CSV don't seem to be reliable
+    # maybe API is most direct for now
+    cluster_data_list = [get_cluster_data_from_fts_api(appeal_id) for appeal_id in appeal_ids]
+
+    if not cluster_data_list:
+        return
+
+    # collapse appeals for a given year
+    concat_cluster_data = pd.concat(cluster_data_list)
+    funding_by_cluster = concat_cluster_data.groupby('name').funding.sum()
+
+    figure = plt.figure()
+    axes = plt.gca()
+
+    funding_by_cluster.plot(ax=axes, kind='barh')
+
+    matplotlib_utils.prettyplotlib_style(axes)
+    axes.yaxis.set_ticks_position('none')
+
+    axes.set_ylabel('')
+    axes.xaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_currency_millions))
+    axes.set_xlabel('USD Millions')
+
+    title = 'FTS funding by cluster - ' + region_of_interest + ' ' + str(year)
+    plt.suptitle(title, fontsize=11)
+
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.95)
+
+    filename = title + '.png'
     write_figure_to_file(figure, dir_path, filename)
 
 
@@ -410,10 +471,5 @@ if __name__ == '__main__':
 
         plot_fts_funding_over_time(base_path, region_of_interest)
 
-        # TODO look at FTS funding by cluster
-        # on FTS website, report "D" is funding by cluster, but that's per appeal
-        # a country can have 0-n appeals per year, and there are no current ones for COL
-        # data also doesn't go back very far
-        # ideas:
-        # - stacked bar charts for past 5-6 years (2008 onwards?) for KEN and YEM
-        # - subplots, maybe 2 columns (KEN vs YEM) and 3 rows (year), with horizontal bar charts
+        for year in (2010, 2011, 2012):
+            plot_fts_cluster_funding(base_path, region_of_interest, year)
