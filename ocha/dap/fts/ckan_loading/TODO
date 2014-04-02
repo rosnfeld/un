@@ -2,6 +2,8 @@
   - Cluster data in Projects is not standardized
     - for example, look at KEN in /tmp/fts/per_country/KEN/fts_KEN_projects.csv
     - lots of "similar sounding" clusters that need to be standardized
+  - Actually, this extends to Cluster data itself
+    - in one appeal, the clusters will be "SHELTER AND NFI" and in the next it will be "SHELTER AND NON-FOOD ITEMS"
 
 Include UNLICENSE file if in new repo under OCHA/DAP
 - see https://github.com/OCHA-DAP/ProjectWiki/wiki/Software-Licensing
