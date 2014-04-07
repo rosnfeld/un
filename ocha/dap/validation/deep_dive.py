@@ -102,7 +102,7 @@ def format_currency_millions(value, position):
     return '{:,.0f}'.format(millions)
 
 
-def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region, comparison_regions):
+def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region, comparison_regions, show_trend=False):
     """
     Generates a simple matplotlib plot of the value timeseries for the given indicator/dataset/region
     """
@@ -141,6 +141,13 @@ def plot_indicator_timeseries_for_region(axes, dataframe, ind_id, ds_id, region,
     pivoted = pivoted.interpolate(method='time')
 
     pivoted[region].plot(ax=axes, label=region, color=REGION_COLOR)
+
+    if show_trend:
+        linear_model = pd.ols(y=pivoted[region], x=pivoted.index.to_series().astype(int), intercept=True)
+        year_ends = pd.date_range(ANALYSIS_START_DATE, ANALYSIS_END_DATE, freq='A')
+        annual_trend = linear_model.predict(x=year_ends.to_series().astype(int))
+        label = region + ' Trend'
+        annual_trend.plot(ax=axes, color=matplotlib_utils.MEDIUM_GRAY, alpha=0.7, linestyle='--', label=label)
 
     if comparison_regions:
         other_regions_pivot = pivoted[pivoted.columns - [region]]
@@ -461,17 +468,17 @@ if __name__ == '__main__':
     for region_of_interest in REGIONS_OF_INTEREST:
         base_path = '/tmp/deep_dive/'
 
-        # # this looks pretty good, as is
-        # plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
-        #
-        # custom_plot_PVN010_different_sources(base_path, region_of_interest)
-        #
-        # plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
-        #
-        # plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
-        # plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
-        #
-        # plot_fts_funding_over_time(base_path, region_of_interest)
+        # this looks pretty good, as is
+        plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
 
-        for year in (2010, 2011, 2012):
-            plot_fts_cluster_funding(base_path, region_of_interest, year)
+        custom_plot_PVN010_different_sources(base_path, region_of_interest)
+
+        plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
+
+        plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
+        plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
+
+        # plot_fts_funding_over_time(base_path, region_of_interest)
+        #
+        # for year in (2010, 2011, 2012):
+        #     plot_fts_cluster_funding(base_path, region_of_interest, year)
