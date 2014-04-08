@@ -167,6 +167,7 @@ def plot_indicator_heatmap(dataframe, ind_id, ds_id):
 
     ind = get_indicator_frame()
     ind_name = ind.name[ind_id]
+    ind_units = ind.units[ind_id]
 
     ds = get_dataset_frame()
     ds_name = ds.name[ds_id]
@@ -182,7 +183,10 @@ def plot_indicator_heatmap(dataframe, ind_id, ds_id):
     plt.title(title, fontsize=12)
 
     # add a "legend" that explains how the colors map to values
-    plt.colorbar()
+    colorbar = plt.colorbar()
+
+    if isinstance(ind_units, basestring):
+        colorbar.set_label(ind_units, rotation=270, labelpad=20)
 
     return fig
 
