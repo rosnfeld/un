@@ -419,13 +419,15 @@ def plot_fts_cluster_funding(base_path, region, year):
     concat_cluster_data = pd.concat(cluster_data_list)
     funding_by_cluster = concat_cluster_data.groupby('name').funding.sum()
 
-    # TODO sort the clusters - alphabetically? by descending amount?
+    # sort by amount
+    funding_by_cluster.sort()
+
     # TODO standardize the cluster names across years
 
     figure = plt.figure()
     axes = plt.gca()
 
-    funding_by_cluster.plot(ax=axes, kind='barh')
+    funding_by_cluster.plot(ax=axes, kind='barh', color=matplotlib_utils.MEDIUM_GRAY, edgecolor='none')
 
     matplotlib_utils.prettyplotlib_style(axes)
     axes.yaxis.set_ticks_position('none')
@@ -469,16 +471,14 @@ if __name__ == '__main__':
         base_path = '/tmp/deep_dive/'
 
         # this looks pretty good, as is
-        plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
-
-        custom_plot_PVN010_different_sources(base_path, region_of_interest)
-
-        plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
-
-        plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
-        plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
+        # plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
+        #
+        # custom_plot_PVN010_different_sources(base_path, region_of_interest)
+        #
+        # plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
+        #
+        # plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
+        # plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
 
         # plot_fts_funding_over_time(base_path, region_of_interest)
-        #
-        # for year in (2010, 2011, 2012):
-        #     plot_fts_cluster_funding(base_path, region_of_interest, year)
+        plot_fts_cluster_funding(base_path, region_of_interest, ANALYSIS_END_DATE.year)
