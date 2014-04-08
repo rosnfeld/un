@@ -480,7 +480,7 @@ def plot_heatmap_per_indicator(dir_path):
 if __name__ == '__main__':
 
     for region_of_interest in REGIONS_OF_INTEREST:
-        base_path = '/tmp/deep_dive/by_country/'
+        base_path = '/tmp/deep_dive/country_plots/'
 
         plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
         plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
@@ -491,5 +491,5 @@ if __name__ == '__main__':
 
         plot_fts_cluster_funding(base_path, region_of_interest, ANALYSIS_END_DATE.year)
 
-    base_path = '/tmp/deep_dive/by_indicator/'
+    base_path = '/tmp/deep_dive/indicator_heatmaps/'
     plot_heatmap_per_indicator(base_path)
