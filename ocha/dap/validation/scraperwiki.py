@@ -185,6 +185,9 @@ def plot_indicator_heatmap(dataframe, ind_id, ds_id):
     # add a "legend" that explains how the colors map to values
     colorbar = plt.colorbar()
 
+    # horizontal is also nice... hard to choose
+    # colorbar = plt.colorbar(orientation='horizontal')
+
     if isinstance(ind_units, basestring):
         colorbar.set_label(ind_units, rotation=270, labelpad=20)
 
