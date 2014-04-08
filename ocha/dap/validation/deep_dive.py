@@ -93,6 +93,9 @@ def build_analysis_matrix(region, comparison_regions):
 def write_figure_to_file(figure, dir_path, filename):
     file_path = os.path.join(dir_path, filename)
     print 'Writing', file_path
+
+    figure.set_size_inches(8.8, 6.6)
+
     figure.savefig(file_path)
     plt.close(figure)
 
@@ -436,7 +439,7 @@ def plot_fts_cluster_funding(base_path, region, year):
     axes.xaxis.set_major_formatter(mpl.ticker.FuncFormatter(format_currency_millions))
     axes.set_xlabel('USD Millions')
 
-    title = 'FTS funding by cluster - ' + region_of_interest + ' ' + str(year)
+    title = 'FTS funding by cluster - ' + region + ' ' + str(year)
     plt.suptitle(title, fontsize=11)
 
     plt.tight_layout()
@@ -446,39 +449,47 @@ def plot_fts_cluster_funding(base_path, region, year):
     write_figure_to_file(figure, dir_path, filename)
 
 
+def plot_heatmap_per_indicator(dir_path):
+    """
+    Save off heatmaps for all numeric indicators
+    """
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    joined = scraperwiki.get_joined_frame()
+    numeric = scraperwiki.get_numeric_version(joined)
+
+    for i, row in numeric[['indID', 'dsID']].drop_duplicates().iterrows():
+        ind_id = row['indID']
+        ds_id = row['dsID']
+
+        if ind_id.startswith('_'):  # only use proper indicators
+            continue
+
+        # require at least a little history for display
+        ind_subset = numeric[(numeric.indID == ind_id) & (numeric.dsID == ds_id)]
+        if len(ind_subset.period.unique()) <= 1:
+            continue
+
+        figure = scraperwiki.plot_indicator_heatmap(numeric, ind_id, ds_id)
+
+        filename = ind_id.replace('/', '_') + '_' + ds_id + '.png'
+        write_figure_to_file(figure, dir_path, filename)
+
+
 if __name__ == '__main__':
-    # all indicators
-    ind = scraperwiki.get_indicator_frame()
-    indicators = set(ind.index) - INDICATORS_TO_EXCLUDE
-    # for region_of_interest in REGIONS_OF_INTEREST:
-    #     plot_indicators_for_region('/tmp/deep_dive', region_of_interest, indicators)
-
-    # tech indicators
-    # for region_of_interest in REGIONS_OF_INTEREST:
-    #     plot_indicators_for_region('/tmp/deep_dive/tech/', region_of_interest, TECH_INDICATORS)
-
-    # custom_plot_tech_indicators('/tmp/deep_dive/tech/')
-
-    # age
-    # for region_of_interest in REGIONS_OF_INTEREST:
-    #     plot_indicators_for_region('/tmp/deep_dive/age/', region_of_interest, AGE_INDICATORS)
-
-    # food_water
-    # for region_of_interest in REGIONS_OF_INTEREST:
-    #     plot_indicators_for_region('/tmp/deep_dive/food_water/', region_of_interest, FOOD_WATER_INDICATORS)
 
     for region_of_interest in REGIONS_OF_INTEREST:
-        base_path = '/tmp/deep_dive/'
+        base_path = '/tmp/deep_dive/by_country/'
 
-        # this looks pretty good, as is
-        # plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
-        #
-        # custom_plot_PVN010_different_sources(base_path, region_of_interest)
-        #
-        # plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
-        #
-        # plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
-        # plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
+        plot_indicators_for_region_combined(base_path, region_of_interest, TECH_INDICATORS, 'Technology Adoption')
+        plot_indicators_for_region_combined(base_path, region_of_interest, FOOD_WATER_INDICATORS, 'Food and Water')
+        plot_indicators_for_region_combined(base_path, region_of_interest, MORTALITY_RATIO_INDICATORS, 'Mortality')
+        plot_indicators_for_region_combined(base_path, region_of_interest, AGE_INDICATORS, 'Aging')
 
-        # plot_fts_funding_over_time(base_path, region_of_interest)
+        custom_plot_PVN010_different_sources(base_path, region_of_interest)
+
         plot_fts_cluster_funding(base_path, region_of_interest, ANALYSIS_END_DATE.year)
+
+    base_path = '/tmp/deep_dive/by_indicator/'
+    plot_heatmap_per_indicator(base_path)
