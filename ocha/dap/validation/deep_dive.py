@@ -456,6 +456,8 @@ def plot_heatmap_per_indicator(dir_path):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
+    mpl.rcdefaults()  # reset matplotlib settings
+
     joined = scraperwiki.get_joined_frame()
     numeric = scraperwiki.get_numeric_version(joined)
 
