@@ -53,11 +53,19 @@ def populate_appeals_level_data(country):
         add_row_to_values('FY030', country, year, row['funding'] / row['current_requirements'])
 
 
-def populate_organization_level_data(country):
-    # this call is slow... possibly extract/cache it?
+def get_organizations_indexed_by_name():
+    """
+    Load organizations from FTS and change index to be name, as sadly that's what is used in
+    other API calls, so we need to join on it.
+    This is a slow call, so it makes sense to cache it.
+    """
     organizations = fts_queries.fetch_organizations_json_as_dataframe()
-    # we'll be joining on name (sadly) so make that the index
-    organizations = organizations.set_index('name')
+    return organizations.set_index('name')
+
+
+def populate_organization_level_data(country, organizations=None):
+    if organizations is None:
+        organizations = get_organizations_indexed_by_name()
 
     # load appeals, analyze each one
     appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
@@ -95,6 +103,11 @@ def populate_organization_level_data(country):
 
 
 if __name__ == "__main__":
-    populate_appeals_level_data('KEN')
-    populate_organization_level_data('KEN')
+    regions_of_interest = ['COL', 'KEN', 'YEM']
+    organizations = get_organizations_indexed_by_name()
+
+    for region in regions_of_interest:
+        populate_appeals_level_data(region)
+        populate_organization_level_data(region, organizations)
+
     print get_values_as_dataframe()
