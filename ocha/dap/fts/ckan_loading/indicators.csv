@@ -1,21 +1,8 @@
-id,name,unit
+indID,name,units
 FY010,Cross-Appeal: Amount Requested (Original),USD
 FY020,Cross-Appeal: Amount Requested (Revised),USD
-FY030,Cross-Appeal: % Covered,Percent
+FY030,Cross-Appeal: % Covered,%
 FY040,Cross-Appeal: Amount Received,USD
-FY050,Cross-Appeal: Amount Received By Cluster Agriculture,USD
-FY060,Cross-Appeal: Amount Received By Cluster Camp Coordination and Camp Management,USD
-FY070,Cross-Appeal: Amount Received By Cluster Cluster not yet specified,USD
-FY080,Cross-Appeal: Amount Received By Cluster Community Restoration/Early Recovery,USD
-FY090,Cross-Appeal: Amount Received By Cluster Coordination,USD
-FY100,Cross-Appeal: Amount Received By Cluster Education,USD
-FY110,Cross-Appeal: Amount Received By Cluster Food Security,USD
-FY120,Cross-Appeal: Amount Received By Cluster Health,USD
-FY130,Cross-Appeal: Amount Received By Cluster Logistics,USD
-FY140,Cross-Appeal: Amount Received By Cluster Nutrition,USD
-FY150,Cross-Appeal: Amount Received By Cluster Protection,USD
-FY160,Cross-Appeal: Amount Received By Cluster Shelter/NFIs,USD
-FY170,"Cross-Appeal: Amount Received By Cluster Water, Sanitation, Hygiene",USD
 FY190,Cross-Appeal: Amount Received By NGOs,USD
 FY200,Cross-Appeal: Amount Received By Private Orgs. & Foundations,USD
 FY210,Cross-Appeal: Amount Received By UN Agencies,USD
