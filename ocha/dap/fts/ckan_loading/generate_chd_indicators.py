@@ -36,12 +36,24 @@ def get_values_as_dataframe():
     )
 
 
+def write_values_as_scraperwiki_style_csv(base_dir):
+    values = get_values_as_dataframe()
+    values['dsID'] = 'fts'
+    values['is_number'] = 1
+    values['source'] = ''
+    values = values.rename(columns={'indicator': 'indID', 'year': 'period'})
+    values = values[['dsID', 'region', 'indID', 'period', 'value', 'is_number', 'source']]
+
+    filename = os.path.join(base_dir, 'value.csv')
+    values.to_csv(filename, index=False)
+
+
 def populate_appeals_level_data(country):
     appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
 
     # group by year, columns are now just the numerical ones:
     #  - current_requirements, emergency_id, funding, original_requirements, pledges
-    appeals_by_year = appeals.groupby('year').sum()
+    appeals_by_year = appeals.groupby('year').sum().astype(float)
 
     # iterating by rows is not considered proper form to but it's easier to follow
     for year, row in appeals_by_year.iterrows():
@@ -110,4 +122,5 @@ if __name__ == "__main__":
         populate_appeals_level_data(region)
         populate_organization_level_data(region, organizations)
 
-    print get_values_as_dataframe()
+    # print get_values_as_dataframe()
+    write_values_as_scraperwiki_style_csv('/tmp')
