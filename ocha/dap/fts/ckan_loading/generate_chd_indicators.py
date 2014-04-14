@@ -51,18 +51,24 @@ def write_values_as_scraperwiki_style_csv(base_dir):
 def populate_appeals_level_data(country):
     appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
 
-    # group by year, columns are now just the numerical ones:
+    # group all appeals by year, columns are now just the numerical ones:
     #  - current_requirements, emergency_id, funding, original_requirements, pledges
-    appeals_by_year = appeals.groupby('year').sum().astype(float)
+    cross_appeals_by_year = appeals.groupby('year').sum().astype(float)
 
     # iterating by rows is not considered proper form to but it's easier to follow
-    for year, row in appeals_by_year.iterrows():
+    for year, row in cross_appeals_by_year.iterrows():
         add_row_to_values('FY010', country, year, row['original_requirements'])
         add_row_to_values('FY020', country, year, row['current_requirements'])
         add_row_to_values('FY040', country, year, row['funding'])
 
         # note this is a fraction, not a percent, and not clipped to 100%
         add_row_to_values('FY030', country, year, row['funding'] / row['current_requirements'])
+
+    # CAP-only
+    cap_appeals = appeals[appeals.type == 'CAP']
+    for appeal_id, row in cap_appeals.iterrows():
+        add_row_to_values('FA010', country, row['year'], row['current_requirements'])
+        add_row_to_values('FA140', country, row['year'], row['funding'])
 
 
 def get_organizations_indexed_by_name():
