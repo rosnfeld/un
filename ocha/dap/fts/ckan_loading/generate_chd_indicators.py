@@ -1,12 +1,23 @@
 """
 Builds CHD indicators from FTS queries
-
-TODO consider zeros vs missing data for these indicators
 """
 
 import fts_queries
 import os
 import pandas as pd
+
+
+# note relying on strings is fragile - could break if things get renamed in FTS
+# we don't seem to have much in the way of alternatives, other than changing the FTS API
+DONOR_ERF = "Emergency Response Fund (OCHA)"
+DONOR_CERF = "Central Emergency Response Fund"
+
+FUNDING_STATUS_PLEDGE = "Pledge"
+
+ORG_TYPE_NGOS = 'NGOs'
+ORG_TYPE_PRIVATE_ORGS = 'Private Orgs. & Foundations'
+ORG_TYPE_UN_AGENCIES = 'UN Agencies'
+
 
 # holds IndicatorValue objects until we are ready to put them in a dataframe
 VALUES = []
@@ -109,15 +120,53 @@ def populate_organization_level_data(country, organizations=None):
     funding_by_type = funding_by_recipient_overall.join(organizations.type).groupby(['type', 'year']).sum()
 
     for (org_type, year), row in funding_by_type.iterrows():
-        if org_type == 'NGOs':
+        if org_type == ORG_TYPE_NGOS:
             add_row_to_values('FY190', country, year, row['funding'])
-        elif org_type == 'Private Orgs. & Foundations':
+        elif org_type == ORG_TYPE_PRIVATE_ORGS:
             add_row_to_values('FY200', country, year, row['funding'])
-        elif org_type == 'UN Agencies':
+        elif org_type == ORG_TYPE_UN_AGENCIES:
             add_row_to_values('FY210', country, year, row['funding'])
         else:
             # note that some organizations (e.g. Red Cross/Red Crescent) fall outside the 3 indicator categories
             print 'Ignoring funding for organization type ' + org_type
+
+
+def populate_pooled_fund_data(country):
+    appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
+
+    contribution_dataframes_by_appeal = []
+
+    for appeal_id, appeal_row in appeals.iterrows():
+        contributions = fts_queries.fetch_contributions_json_for_appeal_as_dataframe(appeal_id)
+
+        if contributions.empty:
+            continue
+
+        # note that is_allocation field is much cleaner and _almost_ gives the same answer,
+        # but found 1 instance of contribution that did not have this set and yet looked like it should
+        # TODO look at getting contributions for all appeals up-front and concatenating earlier
+
+        # exclude pledges
+        contributions = contributions[contributions.status != FUNDING_STATUS_PLEDGE]
+
+        # exclude non-CERF/ERF/CHF
+        donor_filter = lambda x: x in [DONOR_CERF, DONOR_ERF]
+        contributions = contributions[contributions.donor.apply(donor_filter)]
+
+        contribution_dataframes_by_appeal.append(contributions)
+
+    contributions_overall = pd.concat(contribution_dataframes_by_appeal)
+
+    # sum amount by donor-year
+    amount_by_donor_year = contributions_overall.groupby(['donor', 'year']).amount.sum()
+
+    for (donor, year), amount in amount_by_donor_year.iteritems():
+        if donor == DONOR_CERF:
+            add_row_to_values('FY240', country, year, amount)
+        elif donor == DONOR_ERF:
+            add_row_to_values('FY380', country, year, amount)
+        else:
+            print 'Ignoring allocated funds for donor:', donor
 
 
 if __name__ == "__main__":
@@ -127,6 +176,7 @@ if __name__ == "__main__":
     for region in regions_of_interest:
         populate_appeals_level_data(region)
         populate_organization_level_data(region, organizations)
+        populate_pooled_fund_data(region)
 
     # print get_values_as_dataframe()
     write_values_as_scraperwiki_style_csv('/tmp')
