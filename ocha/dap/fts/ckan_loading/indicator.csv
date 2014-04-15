@@ -9,10 +9,10 @@ FY210,Cross-Appeal: Amount Received By UN Agencies,USD
 FY240,CERF Total Allocations,USD
 FY360,CERF Country Allocation as Fraction of CERF Global Allocation,Fraction
 FY370,CERF Country Allocation as Fraction of Total Country Funding,Fraction
-FY380,ERF Total Contributions,USD
+FY380,ERF Total Allocations,USD
 FY500,ERF Country Allocation as Fraction of ERF Global Allocation,Fraction
 FY510,ERF Country Allocation as Fraction of Total Country Funding,Fraction
-FY520,CHF Total Contributions,USD
+FY520,CHF Total Allocations,USD
 FY540,CHF Country Allocation as Fraction of CHF Global Allocation,Fraction
 FY550,CHF Country Allocation as Fraction of Total Country Funding,Fraction
 FY620,Total Country Pooled Fund Allocations,USD
