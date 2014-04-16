@@ -19,25 +19,46 @@ class PooledFundCacheByYear(object):
     """
     Caches global pooled fund amounts by year
     """
-
     def __init__(self):
         self.year_cache = {}
 
     def get_pooled_global_allocation_for_year(self, year):
-        if year in self.year_cache:
-            return self.year_cache[year]
+        if year not in self.year_cache:
+            global_funding_by_donor =\
+                fts_queries.fetch_grouping_type_json_for_year_as_dataframe('funding', year, 'donor', 'organization')
 
-        global_funding_by_donor =\
-            fts_queries.fetch_grouping_type_json_for_year_as_dataframe('funding', year, 'donor', 'organization')
+            pooled_funds_amounts = global_funding_by_donor.funding.ix[POOLED_FUNDS]
 
-        pooled_funds_amounts = global_funding_by_donor.funding.ix[POOLED_FUNDS]
+            self.year_cache[year] = pooled_funds_amounts
 
-        self.year_cache[year] = pooled_funds_amounts
-
-        return pooled_funds_amounts
+        return self.year_cache[year]
 
 
-POOLED_FUND_CACHE_BY_YEAR = PooledFundCacheByYear()
+class CountryFundingCacheByYear(object):
+    """
+    Caches total funding amounts for each country by year
+    """
+    def __init__(self):
+        self.year_cache = {}
+
+        self.country_iso_code_to_name = {}
+        countries = fts_queries.fetch_countries_json_as_dataframe()
+        for country_id, row in countries.iterrows():
+            self.country_iso_code_to_name[row['iso_code_A']] = row['name']
+
+    def get_total_country_funding_for_year(self, country_code, year):
+        if year not in self.year_cache:
+            funding_by_country =\
+                fts_queries.fetch_grouping_type_json_for_year_as_dataframe('funding', year, 'country', 'country')
+
+            self.year_cache[year] = funding_by_country
+
+        country_name = self.country_iso_code_to_name[country_code]
+        return self.year_cache[year].funding.ix[country_name]
+
+
+POOLED_FUND_CACHE = PooledFundCacheByYear()
+COUNTRY_FUNDING_CACHE = CountryFundingCacheByYear()
 
 FUNDING_STATUS_PLEDGE = "Pledge"
 
@@ -188,17 +209,21 @@ def populate_pooled_fund_data(country):
     amount_by_donor_year = contributions_overall.groupby(['donor', 'year']).amount.sum()
 
     for (donor, year), amount in amount_by_donor_year.iteritems():
-        global_allocations = POOLED_FUND_CACHE_BY_YEAR.get_pooled_global_allocation_for_year(year)
+        global_allocations = POOLED_FUND_CACHE.get_pooled_global_allocation_for_year(year)
+        country_funding = COUNTRY_FUNDING_CACHE.get_total_country_funding_for_year(country, year)
 
         if donor == DONOR_CERF:
             add_row_to_values('FY240', country, year, amount)
             add_row_to_values('FY360', country, year, amount/global_allocations[DONOR_CERF])
+            add_row_to_values('FY370', country, year, amount/country_funding)
         elif donor == DONOR_ERF:
             add_row_to_values('FY380', country, year, amount)
             add_row_to_values('FY500', country, year, amount/global_allocations[DONOR_ERF])
+            add_row_to_values('FY510', country, year, amount/country_funding)
         elif donor == DONOR_CHF:
             add_row_to_values('FY520', country, year, amount)
             add_row_to_values('FY540', country, year, amount/global_allocations[DONOR_CHF])
+            add_row_to_values('FY550', country, year, amount/country_funding)
         else:
             print 'Ignoring allocated funds for donor:', donor
 
