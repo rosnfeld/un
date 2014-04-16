@@ -12,6 +12,32 @@ import pandas as pd
 DONOR_ERF = "Emergency Response Fund (OCHA)"
 DONOR_CERF = "Central Emergency Response Fund"
 DONOR_CHF = "Common Humanitarian Fund"
+POOLED_FUNDS = [DONOR_CERF, DONOR_ERF, DONOR_CHF]
+
+
+class PooledFundCacheByYear(object):
+    """
+    Caches global pooled fund amounts by year
+    """
+
+    def __init__(self):
+        self.year_cache = {}
+
+    def get_pooled_global_allocation_for_year(self, year):
+        if year in self.year_cache:
+            return self.year_cache[year]
+
+        global_funding_by_donor =\
+            fts_queries.fetch_grouping_type_json_for_year_as_dataframe('funding', year, 'donor', 'organization')
+
+        pooled_funds_amounts = global_funding_by_donor.funding.ix[POOLED_FUNDS]
+
+        self.year_cache[year] = pooled_funds_amounts
+
+        return pooled_funds_amounts
+
+
+POOLED_FUND_CACHE_BY_YEAR = PooledFundCacheByYear()
 
 FUNDING_STATUS_PLEDGE = "Pledge"
 
@@ -151,7 +177,7 @@ def populate_pooled_fund_data(country):
         contributions = contributions[contributions.status != FUNDING_STATUS_PLEDGE]
 
         # exclude non-CERF/ERF/CHF
-        donor_filter = lambda x: x in [DONOR_CERF, DONOR_ERF, DONOR_CHF]
+        donor_filter = lambda x: x in POOLED_FUNDS
         contributions = contributions[contributions.donor.apply(donor_filter)]
 
         contribution_dataframes_by_appeal.append(contributions)
@@ -162,12 +188,17 @@ def populate_pooled_fund_data(country):
     amount_by_donor_year = contributions_overall.groupby(['donor', 'year']).amount.sum()
 
     for (donor, year), amount in amount_by_donor_year.iteritems():
+        global_allocations = POOLED_FUND_CACHE_BY_YEAR.get_pooled_global_allocation_for_year(year)
+
         if donor == DONOR_CERF:
             add_row_to_values('FY240', country, year, amount)
+            add_row_to_values('FY360', country, year, amount/global_allocations[DONOR_CERF])
         elif donor == DONOR_ERF:
             add_row_to_values('FY380', country, year, amount)
+            add_row_to_values('FY500', country, year, amount/global_allocations[DONOR_ERF])
         elif donor == DONOR_CHF:
             add_row_to_values('FY520', country, year, amount)
+            add_row_to_values('FY540', country, year, amount/global_allocations[DONOR_CHF])
         else:
             print 'Ignoring allocated funds for donor:', donor
 
