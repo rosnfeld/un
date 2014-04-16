@@ -225,7 +225,15 @@ def populate_pooled_fund_data(country):
             add_row_to_values('FY540', country, year, amount/global_allocations[DONOR_CHF])
             add_row_to_values('FY550', country, year, amount/country_funding)
         else:
-            print 'Ignoring allocated funds for donor:', donor
+            raise Exception('Unexpected donor:' + donor)
+
+    # collapse funding across the pooled funds for each year, compare to total country funding
+    for year, pooled_funding in amount_by_donor_year.sum(level=1).iteritems():
+        country_funding = COUNTRY_FUNDING_CACHE.get_total_country_funding_for_year(country, year)
+
+        add_row_to_values('FY620', country, year, pooled_funding)
+        add_row_to_values('FY630', country, year, country_funding)
+        add_row_to_values('FY640', country, year, pooled_funding/country_funding)
 
 
 if __name__ == "__main__":
