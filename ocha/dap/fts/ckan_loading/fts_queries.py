@@ -100,8 +100,15 @@ def fetch_contributions_json_for_emergency_as_dataframe(emergency_id):
         build_json_url('Contribution/emergency/' + str(emergency_id)))
 
 
-def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, grouping=None, alias=None):
+def fetch_grouping_type_json_as_dataframe(middle_part, query, grouping, alias):
     """
+    Query can be one of:
+        Emergency=X
+        Appeal=X
+        Country=X
+        Donor=X
+        Recipient=X
+        Year=X
     Grouping can be one of:
         Donor
         Recipient
@@ -112,7 +119,7 @@ def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, gro
         Cluster
     Alias is used to name the grouping type column and use it as an index.
     """
-    url = build_json_url(middle_part) + '?Appeal=' + str(appeal_id)
+    url = build_json_url(middle_part) + '?' + query
 
     if grouping:
         url += '&GroupBy=' + grouping
@@ -130,14 +137,22 @@ def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, gro
     return processed_frame
 
 
-def fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping=None, alias=None):
+def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, grouping, alias):
+    return fetch_grouping_type_json_as_dataframe(middle_part, 'Appeal=' + str(appeal_id), grouping, alias)
+
+
+def fetch_grouping_type_json_for_year_as_dataframe(middle_part, year, grouping, alias):
+    return fetch_grouping_type_json_as_dataframe(middle_part, 'Year=' + str(year), grouping, alias)
+
+
+def fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping, alias):
     """
     Committed or contributed funds, including carry over from previous years
     """
     return fetch_grouping_type_json_for_appeal_as_dataframe("funding", appeal_id, grouping, alias)
 
 
-def fetch_pledges_json_for_appeal_as_dataframe(appeal_id, grouping=None, alias=None):
+def fetch_pledges_json_for_appeal_as_dataframe(appeal_id, grouping, alias):
     """
     Contains uncommitted pledges, not funding that has already processed to commitment or contribution stages
     """
