@@ -11,6 +11,7 @@ import pandas as pd
 # we don't seem to have much in the way of alternatives, other than changing the FTS API
 DONOR_ERF = "Emergency Response Fund (OCHA)"
 DONOR_CERF = "Central Emergency Response Fund"
+DONOR_CHF = "Common Humanitarian Fund"
 
 FUNDING_STATUS_PLEDGE = "Pledge"
 
@@ -150,7 +151,7 @@ def populate_pooled_fund_data(country):
         contributions = contributions[contributions.status != FUNDING_STATUS_PLEDGE]
 
         # exclude non-CERF/ERF/CHF
-        donor_filter = lambda x: x in [DONOR_CERF, DONOR_ERF]
+        donor_filter = lambda x: x in [DONOR_CERF, DONOR_ERF, DONOR_CHF]
         contributions = contributions[contributions.donor.apply(donor_filter)]
 
         contribution_dataframes_by_appeal.append(contributions)
@@ -165,12 +166,15 @@ def populate_pooled_fund_data(country):
             add_row_to_values('FY240', country, year, amount)
         elif donor == DONOR_ERF:
             add_row_to_values('FY380', country, year, amount)
+        elif donor == DONOR_CHF:
+            add_row_to_values('FY520', country, year, amount)
         else:
             print 'Ignoring allocated funds for donor:', donor
 
 
 if __name__ == "__main__":
     regions_of_interest = ['COL', 'KEN', 'YEM']
+    # regions_of_interest = ['SSD']  # useful for testing CHF
     organizations = get_organizations_indexed_by_name()
 
     for region in regions_of_interest:
