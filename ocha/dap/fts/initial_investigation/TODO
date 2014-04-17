@@ -16,12 +16,11 @@ Centralize string constants in one place
 Ask CJ if splitting out carry-over is of interest
 
 Make some sort of entity relationship diagram to help document FTS data? It seems something roughly like:
-- countries have emergencies, which have appeals, which have projects (categorized into clusters)
-  - actually, I now think the emergency/appeal link is not there
-    - maybe an emergency _can_ have an appeal but does not have to?
-- donations can be made to projects, which are carried out by organizations
-- this doesn't always seem to be true
-  - e.g. there are emergencies (e.g. Madagascar 2013) that don't have appeals, but do have contributions
+- countries can have emergencies, which can have appeals, which have projects (categorized into clusters)
+ - an emergency _can_ have an appeal but does not have to
+    - if an emergency is bad enough, they make an appeal, but often doesn't happen
+- contributions can be made to emergencies and if applicable tagged to a specific appeal
+- funding can be allocated to projects, which are carried out by organizations
 
 Ask FTS they handle duplicates
 - contributions 201359 and 201360 (for appeal 994) look suspiciously similar to me
