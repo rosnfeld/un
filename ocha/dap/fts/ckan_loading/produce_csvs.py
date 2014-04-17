@@ -1,6 +1,6 @@
 """
 Can be used to produce the following CSV files for upload into CKAN:
-  - sectors.csv
+  - sectors.csv  <-- not sure if this is necessary/useful
   - countries.csv
   - organizations.csv
   - emergencies.csv (for a given country)
@@ -62,7 +62,7 @@ def produce_global_csvs(base_output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    produce_sectors_csv(output_dir)
+    # produce_sectors_csv(output_dir)  # not sure if this is necessary
     produce_countries_csv(output_dir)
     produce_organizations_csv(output_dir)
 
