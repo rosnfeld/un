@@ -30,8 +30,8 @@ merged = pd.merge(contributions, projects, left_on='project_code', right_on='cod
 # exclude pledges
 merged = merged[merged.status != PLEDGE_NAME]
 
-# pivot, summing amount by sector and donor
-pivot = merged.pivot_table(values='amount', aggfunc='sum', rows=['sector'], cols=['donor'])
+# pivot, summing amount by cluster and donor
+pivot = merged.pivot_table(values='amount', aggfunc='sum', rows=['cluster'], cols=['donor'])
 
 # only keep CERF/ERF
 pivot_slice = pivot[[CERF_NAME, ERF_NAME]]
