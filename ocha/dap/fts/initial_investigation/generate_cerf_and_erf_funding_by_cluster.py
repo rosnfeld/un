@@ -36,6 +36,6 @@ pivot = merged.pivot_table(values='amount', aggfunc='sum', rows=['cluster'], col
 # only keep CERF/ERF
 pivot_slice = pivot[[CERF_NAME, ERF_NAME]]
 
-# TODO could left join with sectors and fillna(0) to make sure all sectors are present in report, even if not funded
+# TODO figure out to how include clusters with 0 funding
 
 pivot_slice.to_csv(sys.stdout, index=True, encoding='utf-8')
