@@ -180,19 +180,18 @@ def populate_organization_level_data(country, organizations=None):
 
 
 def populate_pooled_fund_data(country):
-    appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
+    emergencies = fts_queries.fetch_emergencies_json_for_country_as_dataframe(country)
 
-    contribution_dataframes_by_appeal = []
+    contribution_dataframes_by_emergency = []
 
-    for appeal_id, appeal_row in appeals.iterrows():
-        contributions = fts_queries.fetch_contributions_json_for_appeal_as_dataframe(appeal_id)
+    for emergency_id, emergency_row in emergencies.iterrows():
+        contributions = fts_queries.fetch_contributions_json_for_emergency_as_dataframe(emergency_id)
 
         if contributions.empty:
             continue
 
         # note that is_allocation field is much cleaner and _almost_ gives the same answer,
-        # but found 1 instance of contribution that did not have this set and yet looked like it should
-        # TODO look at getting contributions for all appeals up-front and concatenating earlier
+        # but found 1 instance of contribution that did not have this field set and yet looked like it should
 
         # exclude pledges
         contributions = contributions[contributions.status != FUNDING_STATUS_PLEDGE]
@@ -201,9 +200,12 @@ def populate_pooled_fund_data(country):
         donor_filter = lambda x: x in POOLED_FUNDS
         contributions = contributions[contributions.donor.apply(donor_filter)]
 
-        contribution_dataframes_by_appeal.append(contributions)
+        if contributions.empty:
+            continue  # if not excluded, can mess up concat
 
-    contributions_overall = pd.concat(contribution_dataframes_by_appeal)
+        contribution_dataframes_by_emergency.append(contributions)
+
+    contributions_overall = pd.concat(contribution_dataframes_by_emergency)
 
     # sum amount by donor-year
     amount_by_donor_year = contributions_overall.groupby(['donor', 'year']).amount.sum()
