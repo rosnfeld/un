@@ -57,7 +57,8 @@ def fetch_emergencies_json_for_year_as_dataframe(year):
 
 def fetch_appeals_json_as_dataframe_given_url(url):
     dataframe = fetch_json_as_dataframe_with_id(url)
-    convert_date_columns_from_string_to_timestamp(dataframe, ['start_date', 'end_date', 'launch_date'])
+    if not dataframe.empty:
+        convert_date_columns_from_string_to_timestamp(dataframe, ['start_date', 'end_date', 'launch_date'])
     return dataframe
 
 
