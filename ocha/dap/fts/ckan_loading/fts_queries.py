@@ -142,6 +142,10 @@ def fetch_grouping_type_json_for_appeal_as_dataframe(middle_part, appeal_id, gro
     return fetch_grouping_type_json_as_dataframe(middle_part, 'Appeal=' + str(appeal_id), grouping, alias)
 
 
+def fetch_grouping_type_json_for_emergency_as_dataframe(middle_part, emergency_id, grouping, alias):
+    return fetch_grouping_type_json_as_dataframe(middle_part, 'Emergency=' + str(emergency_id), grouping, alias)
+
+
 def fetch_grouping_type_json_for_year_as_dataframe(middle_part, year, grouping, alias):
     return fetch_grouping_type_json_as_dataframe(middle_part, 'Year=' + str(year), grouping, alias)
 
@@ -151,6 +155,13 @@ def fetch_funding_json_for_appeal_as_dataframe(appeal_id, grouping, alias):
     Committed or contributed funds, including carry over from previous years
     """
     return fetch_grouping_type_json_for_appeal_as_dataframe("funding", appeal_id, grouping, alias)
+
+
+def fetch_funding_json_for_emergency_as_dataframe(emergency_id, grouping, alias):
+    """
+    Committed or contributed funds, including carry over from previous years
+    """
+    return fetch_grouping_type_json_for_emergency_as_dataframe("funding", emergency_id, grouping, alias)
 
 
 def fetch_pledges_json_for_appeal_as_dataframe(appeal_id, grouping, alias):
