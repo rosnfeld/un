@@ -131,6 +131,9 @@ def fetch_grouping_type_json_as_dataframe(middle_part, query, grouping, alias):
     # oddly the JSON of interest is nested inside the "grouping" element
     processed_frame = pd.DataFrame.from_records(raw_dataframe.grouping.values)
 
+    if processed_frame.empty:
+        return processed_frame
+
     if alias:
         processed_frame = processed_frame.rename(columns={'type': alias, 'amount': middle_part})
         processed_frame = processed_frame.set_index(alias)
