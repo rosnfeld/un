@@ -53,8 +53,17 @@ class CountryFundingCacheByYear(object):
 
             self.year_cache[year] = funding_by_country
 
+        # possibly no funding at all in that year
+        funding_series = self.year_cache[year]
+        if funding_series.empty:
+            return 0
+
         country_name = self.country_iso_code_to_name[country_code]
-        return self.year_cache[year].funding.ix[country_name]
+
+        if country_name in funding_series.funding:
+            return funding_series.funding.ix[country_name]
+        else:
+            return 0
 
 
 POOLED_FUND_CACHE = PooledFundCacheByYear()
