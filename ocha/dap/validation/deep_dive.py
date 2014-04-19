@@ -13,6 +13,7 @@ import pandas as pd
 import datetime
 import textwrap
 import matplotlib_utils
+import fts_queries
 
 REGIONS_OF_INTEREST = ['COL', 'KEN', 'YEM']
 NEIGHBORS = {
@@ -75,6 +76,41 @@ REFERENCE_REGION_COLORMAP = {
     'AFG': (0.7, 0.2, 0.7, 0.8),  # purple
     'SWE': (0.2, 0.7, 0.7, 0.8),  # cyan
 }
+
+
+class CountryFundingCacheByYear(object):
+    """
+    Caches total funding amounts for each country by year
+    """
+    def __init__(self):
+        self.year_cache = {}
+
+        self.country_iso_code_to_name = {}
+        countries = fts_queries.fetch_countries_json_as_dataframe()
+        for country_id, row in countries.iterrows():
+            self.country_iso_code_to_name[row['iso_code_A']] = row['name']
+
+    def get_total_country_funding_for_year(self, country_code, year):
+        if year not in self.year_cache:
+            funding_by_country =\
+                fts_queries.fetch_grouping_type_json_for_year_as_dataframe('funding', year, 'country', 'country')
+
+            self.year_cache[year] = funding_by_country
+
+        # possibly no funding at all in that year
+        funding_series = self.year_cache[year]
+        if funding_series.empty:
+            return 0
+
+        country_name = self.country_iso_code_to_name[country_code]
+
+        if country_name in funding_series.funding:
+            return funding_series.funding.ix[country_name]
+        else:
+            return 0
+
+
+COUNTRY_FUNDING_CACHE = CountryFundingCacheByYear()
 
 
 def build_analysis_matrix(region, comparison_regions):
@@ -354,10 +390,10 @@ def plot_fts_funding_over_time(base_path, region):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
-    contributions_path = '/tmp/fts/per_country/{region}/fts_{region}_contributions.csv'.format(region=region)
-    contributions = pd.read_csv(contributions_path, parse_dates=['year'])
-    # remove contributions that never made it past Pledge status, as they are generally filtered out of FTS reports
-    contributions = contributions[contributions.status != 'Pledge']
+    funding_per_year = {}
+    for year in range(ANALYSIS_START_DATE.year, ANALYSIS_END_DATE.year + 1):
+        funding_per_year[year] = COUNTRY_FUNDING_CACHE.get_total_country_funding_for_year(region, year)
+
 
     figure = plt.figure()
     mpl.rcdefaults()  # reset matplotlib settings
@@ -365,8 +401,7 @@ def plot_fts_funding_over_time(base_path, region):
 
     axes = plt.gca()
 
-    contributions.groupby('year').amount.sum().plot(ax=axes)
-    axes.set_xlim((ANALYSIS_START_DATE, ANALYSIS_END_DATE))
+    pd.Series(funding_per_year).plot(ax=axes)
 
     matplotlib_utils.prettyplotlib_style(axes)
 
@@ -385,15 +420,9 @@ def plot_fts_funding_over_time(base_path, region):
 
 
 def get_fts_appeal_ids_for_year(region, year):
-    appeals_path = '/tmp/fts/per_country/{region}/fts_{region}_appeals.csv'.format(region=region)
-    appeals = pd.read_csv(appeals_path, index_col='id')
+    appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(region)
     appeals_in_year = appeals[appeals.year == year]
     return appeals_in_year.index.values
-
-
-def get_cluster_data_from_fts_api(appeal_id):
-    fts_url = 'http://fts.unocha.org/api/v1/Cluster/appeal/{appeal_id}.json'.format(appeal_id=appeal_id)
-    return pd.read_json(fts_url)
 
 
 def plot_fts_cluster_funding(base_path, region, year):
@@ -411,9 +440,7 @@ def plot_fts_cluster_funding(base_path, region, year):
 
     appeal_ids = get_fts_appeal_ids_for_year(region, year)
 
-    # unfortunately, cluster data in projects CSV don't seem to be reliable
-    # maybe API is most direct for now
-    cluster_data_list = [get_cluster_data_from_fts_api(appeal_id) for appeal_id in appeal_ids]
+    cluster_data_list = [fts_queries.fetch_clusters_json_for_appeal_as_dataframe(appeal_id) for appeal_id in appeal_ids]
 
     if not cluster_data_list:
         return
