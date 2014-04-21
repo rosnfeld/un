@@ -22,6 +22,7 @@ class PooledFundCacheByYear(object):
     def __init__(self):
         self.year_cache = {}
 
+    # TODO investigate why this doesn't match FTS reports exactly for all values
     def get_pooled_global_allocation_for_year(self, year):
         if year not in self.year_cache:
             global_funding_by_donor =\
@@ -114,6 +115,15 @@ def write_values_as_scraperwiki_style_csv(base_dir):
 
     filename = os.path.join(base_dir, 'value.csv')
     values.to_csv(filename, index=False)
+
+
+def get_values_joined_with_indicators():
+    """
+    Useful for debugging
+    """
+    values = get_values_as_dataframe()
+    indicators = pd.read_csv('indicator.csv', index_col='indID')
+    return pd.merge(left=values, right=indicators, left_on='indicator', right_index=True)
 
 
 def populate_appeals_level_data(country):
@@ -223,6 +233,9 @@ def populate_pooled_fund_data(country):
         global_allocations = POOLED_FUND_CACHE.get_pooled_global_allocation_for_year(year)
         country_funding = COUNTRY_FUNDING_CACHE.get_total_country_funding_for_year(country, year)
 
+        # note that 'global_allocations' is close to FTS report numbers but not always exactly the same
+        # so FY360, FY500, FY540 are perhaps slightly off
+
         if donor == DONOR_CERF:
             add_row_to_values('FY240', country, year, amount)
             add_row_to_values('FY360', country, year, amount/global_allocations[DONOR_CERF])
@@ -247,15 +260,22 @@ def populate_pooled_fund_data(country):
         add_row_to_values('FY640', country, year, pooled_funding/country_funding)
 
 
-if __name__ == "__main__":
-    regions_of_interest = ['COL', 'KEN', 'YEM']
-    # regions_of_interest = ['SSD']  # useful for testing CHF
+def populate_data_for_regions(region_list):
+    # cache organizations as it's an expensive call
     organizations = get_organizations_indexed_by_name()
 
-    for region in regions_of_interest:
+    for region in region_list:
         populate_appeals_level_data(region)
         populate_organization_level_data(region, organizations)
         populate_pooled_fund_data(region)
 
+
+if __name__ == "__main__":
+    regions_of_interest = ['COL', 'KEN', 'YEM']
+    # regions_of_interest = ['SSD']  # useful for testing CHF
+
+    populate_data_for_regions(regions_of_interest)
+
     # print get_values_as_dataframe()
-    write_values_as_scraperwiki_style_csv('/tmp')
+    print get_values_joined_with_indicators()
+    # write_values_as_scraperwiki_style_csv('/tmp')
