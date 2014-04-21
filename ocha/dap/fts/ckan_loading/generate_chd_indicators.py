@@ -4,6 +4,7 @@ Builds CHD indicators from FTS queries
 
 import fts_queries
 import os
+import datetime
 import pandas as pd
 
 
@@ -90,6 +91,10 @@ class IndicatorValue(object):
 
 
 def add_row_to_values(indicator, region, year, value):
+    # perhaps the wrong place to add this, but filter out distant future data
+    if year > datetime.date.today().year + 5:
+        return
+
     VALUES.append(IndicatorValue(indicator, region, year, value))
 
 
@@ -277,5 +282,5 @@ if __name__ == "__main__":
     populate_data_for_regions(regions_of_interest)
 
     # print get_values_as_dataframe()
-    print get_values_joined_with_indicators()
-    # write_values_as_scraperwiki_style_csv('/tmp')
+    # print get_values_joined_with_indicators()
+    write_values_as_scraperwiki_style_csv('/tmp')
