@@ -134,6 +134,9 @@ def get_values_joined_with_indicators():
 def populate_appeals_level_data(country):
     appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
 
+    if appeals.empty:
+        return
+
     # group all appeals by year, columns are now just the numerical ones:
     #  - current_requirements, emergency_id, funding, original_requirements, pledges
     cross_appeals_by_year = appeals.groupby('year').sum().astype(float)
@@ -186,6 +189,9 @@ def populate_organization_level_data(country, organizations=None):
 
         funding_dataframes_by_appeal.append(funding_by_recipient)
 
+    if not funding_dataframes_by_appeal:
+        return
+
     funding_by_recipient_overall = pd.concat(funding_dataframes_by_appeal)
 
     # now roll up by organization type
@@ -229,6 +235,9 @@ def populate_pooled_fund_data(country):
 
         contribution_dataframes_by_emergency.append(contributions)
 
+    if not contribution_dataframes_by_emergency:
+        return
+
     contributions_overall = pd.concat(contribution_dataframes_by_emergency)
 
     # sum amount by donor-year
@@ -270,14 +279,16 @@ def populate_data_for_regions(region_list):
     organizations = get_organizations_indexed_by_name()
 
     for region in region_list:
+        print "Populating indicators for region", region
         populate_appeals_level_data(region)
         populate_organization_level_data(region, organizations)
         populate_pooled_fund_data(region)
 
 
 if __name__ == "__main__":
-    regions_of_interest = ['COL', 'KEN', 'YEM']
+    # regions_of_interest = ['COL', 'KEN', 'YEM']
     # regions_of_interest = ['SSD']  # useful for testing CHF
+    regions_of_interest = fts_queries.fetch_countries_json_as_dataframe().iso_code_A
 
     populate_data_for_regions(regions_of_interest)
 
