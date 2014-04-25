@@ -105,7 +105,7 @@ class CountryFundingCacheByYear(object):
         country_name = self.country_iso_code_to_name[country_code]
 
         if country_name in funding_series.funding:
-            return funding_series.funding.ix[country_name]
+            return funding_series.funding.loc[country_name]
         else:
             return 0
 

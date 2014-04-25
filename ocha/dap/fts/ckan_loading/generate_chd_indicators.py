@@ -29,7 +29,7 @@ class PooledFundCacheByYear(object):
             global_funding_by_donor =\
                 fts_queries.fetch_grouping_type_json_for_year_as_dataframe('funding', year, 'donor', 'organization')
 
-            pooled_funds_amounts = global_funding_by_donor.funding.ix[POOLED_FUNDS]
+            pooled_funds_amounts = global_funding_by_donor.funding.loc[POOLED_FUNDS]
 
             self.year_cache[year] = pooled_funds_amounts
 
@@ -63,7 +63,7 @@ class CountryFundingCacheByYear(object):
         country_name = self.country_iso_code_to_name[country_code]
 
         if country_name in funding_series.funding:
-            return funding_series.funding.ix[country_name]
+            return funding_series.funding.loc[country_name]
         else:
             return 0
 
