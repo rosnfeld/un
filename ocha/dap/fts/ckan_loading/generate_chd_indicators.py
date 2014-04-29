@@ -16,7 +16,7 @@ DONOR_CHF = "Common Humanitarian Fund"
 POOLED_FUNDS = [DONOR_CERF, DONOR_ERF, DONOR_CHF]
 
 YEAR_START = 1999  # first year that FTS has data
-YEAR_END = datetime.date.today().year + 1  # include up to next year
+YEAR_END = datetime.date.today().year + 1  # next year can start to show up near current year-end
 
 
 class PooledFundCacheByYear(object):
@@ -143,28 +143,45 @@ def populate_appeals_level_data(country):
     """
     Populate data based on the "appeals" concept in FTS.
     If funding data is not associated with an appeal, it will be excluded.
-    If there was no appeal, perhaps we should fill in zeros for all items?
+    If there was no appeal, fill in zeros for all items.
+    This unfortunately conflates "zero" vs "missing" data.
     """
     appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
 
-    if appeals.empty:
-        return
+    if not appeals.empty:
+        # group all appeals by year, columns are now just the numerical ones:
+        #  - current_requirements, emergency_id, funding, original_requirements, pledges
+        cross_appeals_by_year = appeals.groupby('year').sum().astype(float)
+        # Consolidated Appeals Process (CAP)-only
+        cap_appeals_by_year = appeals[appeals.type == 'CAP'].groupby('year').sum().astype(float)
+    else:
+        # just re-use the empty frames
+        cross_appeals_by_year = appeals
+        cap_appeals_by_year = appeals
 
-    # group all appeals by year, columns are now just the numerical ones:
-    #  - current_requirements, emergency_id, funding, original_requirements, pledges
-    cross_appeals_by_year = appeals.groupby('year').sum().astype(float)
+    for year in range(YEAR_START, YEAR_END + 1):
+        original_requirements = 0
+        current_requirements = 0
+        funding = 0
 
-    # iterating by rows is not considered proper form to but it's easier to follow
-    for year, row in cross_appeals_by_year.iterrows():
-        add_row_to_values('FY010', country, year, row['original_requirements'])
-        add_row_to_values('FY020', country, year, row['current_requirements'])
-        add_row_to_values('FY040', country, year, row['funding'])
+        if year in cross_appeals_by_year.index:
+            original_requirements = cross_appeals_by_year['original_requirements'][year]
+            current_requirements = cross_appeals_by_year['current_requirements'][year]
+            funding = cross_appeals_by_year['funding'][year]
 
-    # Consolidated Appeals Process (CAP)-only
-    cap_appeals = appeals[appeals.type == 'CAP']
-    for appeal_id, row in cap_appeals.iterrows():
-        add_row_to_values('FA010', country, row['year'], row['current_requirements'])
-        add_row_to_values('FA140', country, row['year'], row['funding'])
+        add_row_to_values('FY010', country, year, original_requirements)
+        add_row_to_values('FY020', country, year, current_requirements)
+        add_row_to_values('FY040', country, year, funding)
+
+        cap_requirements = 0
+        cap_funding = 0
+
+        if year in cap_appeals_by_year.index:
+            cap_requirements = cap_appeals_by_year['current_requirements'][year]
+            cap_funding = cap_appeals_by_year['funding'][year]
+
+        add_row_to_values('FA010', country, year, cap_requirements)
+        add_row_to_values('FA140', country, year, cap_funding)
 
 
 def get_organizations_indexed_by_name():
