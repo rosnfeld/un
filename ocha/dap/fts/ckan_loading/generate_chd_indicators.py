@@ -15,6 +15,9 @@ DONOR_CERF = "Central Emergency Response Fund"
 DONOR_CHF = "Common Humanitarian Fund"
 POOLED_FUNDS = [DONOR_CERF, DONOR_ERF, DONOR_CHF]
 
+YEAR_START = 1999  # first year that FTS has data
+YEAR_END = datetime.date.today().year + 1  # include up to next year
+
 
 class PooledFundCacheByYear(object):
     """
@@ -93,7 +96,7 @@ class IndicatorValue(object):
 
 def add_row_to_values(indicator, region, year, value):
     # perhaps the wrong place to add this, but filter out distant future data
-    if year > datetime.date.today().year + 5:
+    if year > YEAR_END:
         return
 
     if np.isinf(value):
