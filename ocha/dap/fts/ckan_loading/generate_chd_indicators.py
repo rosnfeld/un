@@ -81,7 +81,6 @@ ORG_TYPE_NGOS = 'NGOs'
 ORG_TYPE_PRIVATE_ORGS = 'Private Orgs. & Foundations'
 ORG_TYPE_UN_AGENCIES = 'UN Agencies'
 
-
 # holds IndicatorValue objects until we are ready to put them in a dataframe
 VALUES = []
 
@@ -195,6 +194,9 @@ def get_organizations_indexed_by_name():
 
 
 def populate_organization_level_data(country, organizations=None):
+    """
+    Populate data on funding by organization type
+    """
     if organizations is None:
         organizations = get_organizations_indexed_by_name()
 
@@ -216,24 +218,28 @@ def populate_organization_level_data(country, organizations=None):
 
         funding_dataframes_by_appeal.append(funding_by_recipient)
 
-    if not funding_dataframes_by_appeal:
-        return
+    if funding_dataframes_by_appeal:
+        funding_by_recipient_overall = pd.concat(funding_dataframes_by_appeal)
+        # now roll up by organization type
+        funding_by_type = funding_by_recipient_overall.join(organizations.type).groupby(['type', 'year']).sum()
+    else:
+        funding_by_type = pd.DataFrame()  # just an empty frame
 
-    funding_by_recipient_overall = pd.concat(funding_dataframes_by_appeal)
+    for year in range(YEAR_START, YEAR_END + 1):
+        ngo_funding = 0
+        private_org_funding = 0
+        un_agency_funding = 0
 
-    # now roll up by organization type
-    funding_by_type = funding_by_recipient_overall.join(organizations.type).groupby(['type', 'year']).sum()
+        if (ORG_TYPE_NGOS, year) in funding_by_type.index:
+            ngo_funding = funding_by_type.loc[(ORG_TYPE_NGOS, year)].funding
+        if (ORG_TYPE_PRIVATE_ORGS, year) in funding_by_type.index:
+            private_org_funding = funding_by_type.loc[(ORG_TYPE_PRIVATE_ORGS, year)].funding
+        if (ORG_TYPE_UN_AGENCIES, year) in funding_by_type.index:
+            un_agency_funding = funding_by_type.loc[(ORG_TYPE_UN_AGENCIES, year)].funding
 
-    for (org_type, year), row in funding_by_type.iterrows():
-        if org_type == ORG_TYPE_NGOS:
-            add_row_to_values('FY190', country, year, row['funding'])
-        elif org_type == ORG_TYPE_PRIVATE_ORGS:
-            add_row_to_values('FY200', country, year, row['funding'])
-        elif org_type == ORG_TYPE_UN_AGENCIES:
-            add_row_to_values('FY210', country, year, row['funding'])
-        else:
-            # note that some organizations (e.g. Red Cross/Red Crescent) fall outside the 3 indicator categories
-            print 'Ignoring funding for organization type ' + org_type
+        add_row_to_values('FY190', country, year, ngo_funding)
+        add_row_to_values('FY200', country, year, private_org_funding)
+        add_row_to_values('FY210', country, year, un_agency_funding)
 
 
 def populate_pooled_fund_data(country):
