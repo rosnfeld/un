@@ -1,7 +1,6 @@
 indID,name,units
 FY010,Cross-Appeal: Amount Requested (Original),USD
 FY020,Cross-Appeal: Amount Requested (Revised),USD
-FY030,Cross-Appeal: Fraction Covered,Fraction
 FY040,Cross-Appeal: Amount Received,USD
 FY190,Cross-Appeal: Amount Received By NGOs,USD
 FY200,Cross-Appeal: Amount Received By Private Orgs. & Foundations,USD
@@ -17,6 +16,5 @@ FY540,CHF Country Allocation as Fraction of CHF Global Allocation,Fraction
 FY550,CHF Country Allocation as Fraction of Total Country Funding,Fraction
 FY620,Total Country Pooled Fund Allocations,USD
 FY630,Total Country Humanitarian Funding Received,USD
-FY640,Country Pooled Funding Received as Fraction of Total,Fraction
 FA010,CAP Amount Required (Revised),USD
 FA140,CAP Amount Received,USD

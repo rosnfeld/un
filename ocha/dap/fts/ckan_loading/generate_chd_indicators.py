@@ -140,6 +140,11 @@ def get_values_joined_with_indicators():
 
 
 def populate_appeals_level_data(country):
+    """
+    Populate data based on the "appeals" concept in FTS.
+    If funding data is not associated with an appeal, it will be excluded.
+    If there was no appeal, perhaps we should fill in zeros for all items?
+    """
     appeals = fts_queries.fetch_appeals_json_for_country_as_dataframe(country)
 
     if appeals.empty:
@@ -155,10 +160,7 @@ def populate_appeals_level_data(country):
         add_row_to_values('FY020', country, year, row['current_requirements'])
         add_row_to_values('FY040', country, year, row['funding'])
 
-        # note this is a fraction, not a percent, and not clipped to 100%
-        add_row_to_values('FY030', country, year, row['funding'] / row['current_requirements'])
-
-    # CAP-only
+    # Consolidated Appeals Process (CAP)-only
     cap_appeals = appeals[appeals.type == 'CAP']
     for appeal_id, row in cap_appeals.iterrows():
         add_row_to_values('FA010', country, row['year'], row['current_requirements'])
@@ -279,7 +281,6 @@ def populate_pooled_fund_data(country):
 
         add_row_to_values('FY620', country, year, pooled_funding)
         add_row_to_values('FY630', country, year, country_funding)
-        add_row_to_values('FY640', country, year, pooled_funding/country_funding)
 
 
 def populate_data_for_regions(region_list):
