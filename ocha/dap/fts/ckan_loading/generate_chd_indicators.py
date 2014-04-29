@@ -6,7 +6,7 @@ import fts_queries
 import os
 import datetime
 import pandas as pd
-
+import numpy as np
 
 # note relying on strings is fragile - could break if things get renamed in FTS
 # we don't seem to have much in the way of alternatives, other than changing the FTS API
@@ -24,6 +24,7 @@ class PooledFundCacheByYear(object):
         self.year_cache = {}
 
     # TODO investigate why this doesn't match FTS reports exactly for all values
+    # - email sent to Sean Foo about it 2014-04-21
     def get_pooled_global_allocation_for_year(self, year):
         if year not in self.year_cache:
             global_funding_by_donor =\
@@ -95,6 +96,9 @@ def add_row_to_values(indicator, region, year, value):
     if year > datetime.date.today().year + 5:
         return
 
+    if np.isinf(value):
+        return
+
     VALUES.append(IndicatorValue(indicator, region, year, value))
 
 
@@ -120,6 +124,7 @@ def write_values_as_scraperwiki_style_csv(base_dir):
 
     filename = os.path.join(base_dir, 'value.csv')
     values.to_csv(filename, index=False)
+    print 'Wrote', filename
 
 
 def get_values_joined_with_indicators():
@@ -288,6 +293,7 @@ def populate_data_for_regions(region_list):
 if __name__ == "__main__":
     # regions_of_interest = ['COL', 'KEN', 'YEM']
     # regions_of_interest = ['SSD']  # useful for testing CHF
+    # regions_of_interest = ['AFG']  # useful for testing spotty data
     regions_of_interest = fts_queries.fetch_countries_json_as_dataframe().iso_code_A
 
     populate_data_for_regions(regions_of_interest)
